@@ -1,1 +1,1 @@
-export type { HelloWorldTask } from "./example.ts";
+export type { BuildDocsTask } from './build-docs.ts';

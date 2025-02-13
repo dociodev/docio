@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "server:dev": "deno serve --env-file --allow-net --allow-env --watch -R src/main.ts",
+    "server:dev": "node node_modules/.bin/wrangler dev --port 8786 src/main.ts",
     "trigger:dev": "node node_modules/.bin/trigger dev",
     "dev": {
       "command": "echo 'Starting server and trigger.dev...'",
@@ -8,13 +8,18 @@
     }
   },
   "imports": {
-    "@david/dax": "jsr:@david/dax@^0.42.0",
     "@std/assert": "jsr:@std/assert@1",
     "@std/http": "jsr:@std/http@1",
     "@trigger.dev/sdk": "npm:@trigger.dev/sdk@^3.3.15",
-    "simple-git": "npm:simple-git@^3.27.0",
-    "trigger.dev": "npm:trigger.dev@^3.3.15"
+    "dax-sh": "npm:dax-sh@^0.42.0",
+    "hono": "npm:hono@^4.7.1",
+    "rspress": "npm:rspress@^1.41.2",
+    "trigger.dev": "npm:trigger.dev@^3.3.15",
+    "wrangler": "npm:wrangler@^3.108.1"
   },
   "nodeModulesDir": "auto",
-  "workspace": ["./packages/*"]
+  "workspace": ["./packages/*"],
+  "fmt": {
+    "singleQuote": true
+  }
 }

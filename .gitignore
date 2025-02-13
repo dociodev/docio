@@ -1,3 +1,6 @@
 .trigger
 .env
+.dev.vars
 node_modules
+tmp
+.wrangler

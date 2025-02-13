@@ -1,14 +1,19 @@
-import { tasks } from "@trigger.dev/sdk/v3";
-import type { HelloWorldTask } from "@docio/trigger";
+import { configure, tasks } from '@trigger.dev/sdk/v3';
+import type { BuildDocsTask } from '@docio/trigger';
+import { Hono } from 'hono';
 
-export default {
-  async fetch(req) {
-    await tasks.trigger<HelloWorldTask>("hello-world", {
-      payload: {
-        message: "Hello, world!",
-      },
-    });
+const app = new Hono<{ Bindings: { TRIGGER_SECRET_KEY: string } }>();
 
-    return new Response("Not found", { status: 404 });
-  },
-} satisfies Deno.ServeDefaultExport;
+app.post('/github/webhook', async (c) => {
+  configure({ accessToken: c.env.TRIGGER_SECRET_KEY });
+
+  await tasks.trigger<BuildDocsTask>('build-docs', {
+    payload: {
+      message: 'Hello, world!',
+    },
+  });
+
+  return c.json({ message: 'Hello, world!' });
+});
+
+export default app;
