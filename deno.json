@@ -8,9 +8,13 @@
     }
   },
   "imports": {
+    "@cloudflare/workers-types": "npm:@cloudflare/workers-types@^4.20250204.0",
+    "@octokit/app": "npm:@octokit/app@^15.1.3",
+    "@octokit/core": "npm:@octokit/core@^6.1.4",
     "@std/assert": "jsr:@std/assert@1",
     "@std/http": "jsr:@std/http@1",
     "@trigger.dev/sdk": "npm:@trigger.dev/sdk@^3.3.15",
+    "cloudflare": "npm:cloudflare@^4.1.0",
     "dax-sh": "npm:dax-sh@^0.42.0",
     "hono": "npm:hono@^4.7.1",
     "rspress": "npm:rspress@^1.41.2",
@@ -18,7 +22,7 @@
     "wrangler": "npm:wrangler@^3.108.1"
   },
   "nodeModulesDir": "auto",
-  "workspace": ["./packages/*"],
+  "workspace": ["./packages/*", "./src"],
   "fmt": {
     "singleQuote": true
   }

@@ -4,3 +4,4 @@
 node_modules
 tmp
 .wrangler
+private-key.pem
