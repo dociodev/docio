@@ -1,9 +1,7 @@
-import { configure, tasks } from '@trigger.dev/sdk/v3';
-import type { BuildDocsTask } from '@docio/trigger';
 import { Hono } from 'hono';
 
 const app = new Hono<
-  { Bindings: { TRIGGER_SECRET_KEY: string; GITHUB_WEBHOOK_SECRET: string } }
+  { Bindings: { GITHUB_WEBHOOK_SECRET: string } }
 >();
 
 async function signRequestBody(secret: string, body: string): Promise<string> {
@@ -46,9 +44,7 @@ app.post('/github/webhook', async (c) => {
     return c.json({ message: 'Not a push event' });
   }
 
-  configure({ accessToken: c.env.TRIGGER_SECRET_KEY });
-
-  await tasks.trigger<BuildDocsTask>('build-docs', await c.req.json());
+  // await tasks.trigger<BuildDocsTask>('build-docs', await c.req.json());
 
   return c.json({});
 });

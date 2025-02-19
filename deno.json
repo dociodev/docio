@@ -1,10 +1,9 @@
 {
   "tasks": {
     "server:dev": "node node_modules/.bin/wrangler dev --port 8786 src/main.ts",
-    "trigger:dev": "node node_modules/.bin/trigger dev",
     "dev": {
-      "command": "echo 'Starting server and trigger.dev...'",
-      "dependencies": ["trigger:dev", "server:dev"]
+      "command": "echo 'Starting dev server...'",
+      "dependencies": ["server:dev"]
     }
   },
   "imports": {
@@ -13,12 +12,10 @@
     "@octokit/core": "npm:@octokit/core@^6.1.4",
     "@std/assert": "jsr:@std/assert@1",
     "@std/http": "jsr:@std/http@1",
-    "@trigger.dev/sdk": "npm:@trigger.dev/sdk@^3.3.15",
     "cloudflare": "npm:cloudflare@^4.1.0",
     "dax-sh": "npm:dax-sh@^0.42.0",
     "hono": "npm:hono@^4.7.1",
     "rspress": "npm:rspress@^1.41.2",
-    "trigger.dev": "npm:trigger.dev@^3.3.15",
     "wrangler": "npm:wrangler@^3.108.1"
   },
   "nodeModulesDir": "auto",

@@ -5,7 +5,6 @@ import process from 'node:process';
 import asyncfs from 'node:fs/promises';
 import fs from 'node:fs';
 import { Cloudflare } from 'cloudflare';
-import { Buffer } from 'node:buffer';
 
 const app = new App({
   privateKey: await asyncfs.readFile(
@@ -149,28 +148,25 @@ async function getFiles(
   });
 }
 
-async function writeFile(path: string, content: string) {
-  await logger.trace('Writing file', async (span) => {
-    await asyncfs.writeFile(
-      `./tmp/repo/docs/${path}`,
-      Buffer.from(content, 'base64').toString('utf8'),
-      'utf8',
-    );
-  });
-}
-
 async function buildDocs() {
   return await logger.trace('Building docs', async () => {
     try {
-      //       await asyncfs.writeFile(
-      //         './tmp/repo/rspress.config.ts',
-      //         `import { defineConfig } from 'rspress/config';
+      fs.writeFileSync(
+        './tmp/repo/run.ts',
+        `import config from "./rspress.config.ts";
 
-      // export default defineConfig({});`,
-      //         'utf8',
-      //       );
+console.log(config);
+`,
+      );
 
-      await $`deno ../../node_modules/.bin/rspress build`.cwd('./tmp/repo');
+      const result = await $`deno run ./run.ts`.cwd('./tmp/repo').text();
+
+      fs.writeFileSync(
+        './tmp/repo/rspress.config.ts',
+        `export default ${JSON.stringify(JSON.parse(result), null, 2)};`,
+      );
+
+      await $`rspress build`.cwd('./tmp/repo');
 
       return fs.existsSync('./tmp/repo/doc_build');
     } catch (error) {
