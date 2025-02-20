@@ -5,10 +5,9 @@ import { $ } from '@david/dax';
 export async function build(
   repo: string,
   ref: string,
-  installationId: string,
 ) {
   const response = await fetch(
-    `${Deno.env.get('WORKER_URL')}/${installationId}/${repo}/${ref}`,
+    `${Deno.env.get('WORKER_URL')}/${repo}/${ref}`,
   );
 
   if (!response.ok) {

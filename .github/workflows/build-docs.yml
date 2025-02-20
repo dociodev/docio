@@ -25,7 +25,7 @@ jobs:
         run: deno install --allow-scripts
 
       - name: Build documentation
-        run: deno task docio build ${{ github.event.client_payload.repo }} ${{ github.event.client_payload.ref }} ${{ github.event.client_payload.installationId }}
+        run: deno task docio build ${{ github.event.client_payload.repo }} ${{ github.event.client_payload.ref }}
         env:
           WORKER_URL: https://docio.katsuba.workers.dev
 
