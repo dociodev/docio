@@ -7,6 +7,11 @@ export async function download(
 ) {
   const response = await fetch(
     `${Deno.env.get('WORKER_URL')}/${repo}/${ref}`,
+    {
+      headers: {
+        'X-Worker-Secret': Deno.env.get('WORKER_SECRET')!,
+      },
+    },
   );
 
   if (!response.ok) {

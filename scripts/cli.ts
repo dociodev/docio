@@ -8,6 +8,12 @@ await new Command()
   .description('Docio CLI')
   .version('v0.0.0')
   .command('build', 'Build the project')
+  .env('WORKER_SECRET=<string>', 'Worker secret', {
+    required: true,
+  })
+  .env('WORKER_URL=<string>', 'Worker URL', {
+    required: true,
+  })
   .action(async () => {
     await build();
   })

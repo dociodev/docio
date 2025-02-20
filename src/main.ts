@@ -11,6 +11,7 @@ const app = new Hono<
       GITHUB_PRIVATE_KEY: string;
       GITHUB_APP_ID: string;
       GITHUB_PERSONAL_ACCESS_TOKEN: string;
+      WORKER_SECRET: string;
       kv: KVNamespace;
     };
   }
@@ -33,61 +34,95 @@ async function signRequestBody(secret: string, body: string): Promise<string> {
     ).join('');
 }
 
-app.post('/github/webhook', async (c) => {
-  const signature = c.req.header('X-Hub-Signature-256');
-
-  if (!signature) {
-    return c.json({ message: 'No signature' }, 400);
-  }
-
-  const body = await c.req.raw.clone().text();
-
-  if (!body) {
-    return c.json({ message: 'No body' }, 400);
-  }
-
-  if (await signRequestBody(c.env.GITHUB_WEBHOOK_SECRET, body) !== signature) {
-    return c.json({ message: 'Invalid signature' }, 400);
-  }
-
-  const eventType = c.req.header('X-GitHub-Event');
-
-  if (eventType !== 'push') {
-    return c.json({ message: 'Not a push event' });
-  }
-
-  const payload = await c.req.json();
-
-  const repoName = payload.repository.name;
-  const ownerLogin = payload.repository.owner.login;
-  const ref = payload.ref.replace('refs/heads/', '');
-
-  await c.env.kv.put(
-    `${ownerLogin}/${repoName}/${ref}`,
-    JSON.stringify({
-      installationId: payload.installation.id,
+app.post(
+  '/github/webhook',
+  zValidator(
+    'header',
+    z.object({
+      'X-Hub-Signature-256': z.string(),
+      'X-GitHub-Event': z.enum(['push']),
     }),
-  );
+  ),
+  async (c, next) => {
+    const { 'X-Hub-Signature-256': signature } = c.req.valid('header');
 
-  const personalOctokit = new Octokit({
-    auth: c.env.GITHUB_PERSONAL_ACCESS_TOKEN,
-  });
+    const body = await c.req.raw.clone().text();
 
-  await personalOctokit.request('POST /repos/{owner}/{repo}/dispatches', {
-    owner: 'IKatsuba',
-    repo: 'docio',
-    event_type: 'build-docs',
-    client_payload: {
-      repo: `${ownerLogin}/${repoName}`,
-      ref,
-    },
-  });
+    if (!body) {
+      return c.json({ message: 'No body' }, 400);
+    }
 
-  return c.json({});
-});
+    if (
+      await signRequestBody(c.env.GITHUB_WEBHOOK_SECRET, body) !== signature
+    ) {
+      return c.json({ message: 'Invalid signature' }, 400);
+    }
+
+    await next();
+  },
+  zValidator(
+    'json',
+    z.object({
+      repository: z.object({
+        name: z.string(),
+        owner: z.object({ login: z.string() }),
+      }),
+      ref: z.string(),
+      installation: z.object({ id: z.number() }),
+    }),
+  ),
+  async (c) => {
+    const payload = c.req.valid('json');
+
+    const repoName = payload.repository.name;
+    const ownerLogin = payload.repository.owner.login;
+    const ref = payload.ref.replace('refs/heads/', '').replace(
+      'refs/tags/',
+      '',
+    );
+
+    await c.env.kv.put(
+      `${ownerLogin}/${repoName}/${ref}`,
+      JSON.stringify({
+        installationId: payload.installation.id,
+      }),
+    );
+
+    const personalOctokit = new Octokit({
+      auth: c.env.GITHUB_PERSONAL_ACCESS_TOKEN,
+    });
+
+    await personalOctokit.request('POST /repos/{owner}/{repo}/dispatches', {
+      owner: 'IKatsuba',
+      repo: 'docio',
+      event_type: 'build-docs',
+      client_payload: {
+        repo: `${ownerLogin}/${repoName}`,
+        ref,
+      },
+    });
+
+    return c.json({});
+  },
+);
 
 app.get(
   '/:owner/:repo/:ref',
+  zValidator(
+    'header',
+    z.object({
+      'X-Worker-Secret': z.string(),
+    }),
+  ),
+  async (c, next) => {
+    const { 'X-Worker-Secret': secret } = c.req.valid('header');
+
+    if (secret !== c.env.WORKER_SECRET) {
+      return c.json({ message: 'Invalid secret' }, 401);
+    }
+
+    await next();
+  },
   zValidator(
     'param',
     z.object({

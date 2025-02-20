@@ -28,6 +28,7 @@ jobs:
         run: deno task docio download ${{ github.event.client_payload.repo }} ${{ github.event.client_payload.ref }}
         env:
           WORKER_URL: https://docio.katsuba.workers.dev
+          WORKER_SECRET: ${{ secrets.WORKER_SECRET }}
 
       - name: Build documentation
         run: deno task docio build
