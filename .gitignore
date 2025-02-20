@@ -1,5 +1,6 @@
 .env
 .dev.vars
+.secrets
 node_modules
 tmp
 .wrangler

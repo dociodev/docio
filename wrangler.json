@@ -7,5 +7,11 @@
   "observability": {
     "enabled": true
   },
+  "r2_buckets": [
+    {
+      "bucket_name": "docio-repos",
+      "binding": "reposBucket"
+    }
+  ],
   "tsconfig": "./tsconfig.wrangler.json"
 }

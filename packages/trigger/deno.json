@@ -1,9 +1,0 @@
-{
-  "name": "@docio/trigger",
-  "description": "Trigger.dev SDK for Deno",
-  "version": "0.1.0",
-  "exports": {
-    ".": "./mod.ts"
-  },
-  "imports": {}
-}
