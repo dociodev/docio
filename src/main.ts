@@ -100,7 +100,7 @@ app.post(
 
     await personalOctokit.request('POST /repos/{owner}/{repo}/dispatches', {
       owner: 'IKatsuba',
-      repo: 'docio',
+      repo: 'docio-hosting',
       event_type: 'build-docs',
       client_payload: {
         repo: `${ownerLogin}/${repoName}`,
