@@ -7,10 +7,10 @@
   "observability": {
     "enabled": true
   },
-  "r2_buckets": [
+  "kv_namespaces": [
     {
-      "bucket_name": "docio-repos",
-      "binding": "reposBucket"
+      "binding": "kv",
+      "id": "bd8a09c88d0c4611a0cf12e82117270b"
     }
   ],
   "tsconfig": "./tsconfig.wrangler.json"

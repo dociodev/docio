@@ -11,7 +11,7 @@ const app = new Hono<
       GITHUB_PRIVATE_KEY: string;
       GITHUB_APP_ID: string;
       GITHUB_PERSONAL_ACCESS_TOKEN: string;
-      reposBucket: R2Bucket;
+      kv: KVNamespace;
     };
   }
 >();
@@ -61,6 +61,13 @@ app.post('/github/webhook', async (c) => {
   const repoName = payload.repository.name;
   const ownerLogin = payload.repository.owner.login;
 
+  await c.env.kv.put(
+    `${ownerLogin}/${repoName}`,
+    JSON.stringify({
+      installationId: payload.installation.id,
+    }),
+  );
+
   const personalOctokit = new Octokit({
     auth: c.env.GITHUB_PERSONAL_ACCESS_TOKEN,
   });
@@ -71,7 +78,6 @@ app.post('/github/webhook', async (c) => {
     event_type: 'build-docs',
     client_payload: {
       repo: `${ownerLogin}/${repoName}`,
-      installationId: payload.installation.id,
       ref: payload.ref.replace('refs/heads/', ''),
     },
   });
@@ -80,18 +86,28 @@ app.post('/github/webhook', async (c) => {
 });
 
 app.get(
-  '/:installationId/:owner/:repo/:ref',
+  '/:owner/:repo/:ref',
   zValidator(
     'param',
     z.object({
-      installationId: z.coerce.number(),
       owner: z.string(),
       repo: z.string(),
       ref: z.string(),
     }),
   ),
   async (c) => {
-    const { installationId, owner, repo, ref } = c.req.valid('param');
+    const { owner, repo, ref } = c.req.valid('param');
+
+    const { installationId } = await c.env.kv.get<{ installationId: number }>(
+      `${owner}/${repo}`,
+      {
+        type: 'json',
+      },
+    ) ?? { installationId: undefined };
+
+    if (!installationId) {
+      return c.json({ message: 'Not found' }, 404);
+    }
 
     const app = new App({
       privateKey: c.env.GITHUB_PRIVATE_KEY!,
