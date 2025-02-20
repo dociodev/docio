@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: deno install --allow-scripts
 
-      - name: Build documentation
+      - name: Download documentation
         run: deno task docio download ${{ github.event.client_payload.repo }} ${{ github.event.client_payload.ref }}
         env:
           WORKER_URL: https://docio.katsuba.workers.dev
