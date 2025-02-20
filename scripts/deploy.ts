@@ -4,8 +4,9 @@ import { $ } from '@david/dax';
 
 export async function deploy(
   repo: string,
+  ref: string,
 ) {
-  const slug = slugify(repo);
+  const slug = slugify(`${repo}/${ref}`);
 
   const cloudflare = new Cloudflare({
     apiToken: Deno.env.get('CLOUDFLARE_API_TOKEN')!,

@@ -60,9 +60,10 @@ app.post('/github/webhook', async (c) => {
 
   const repoName = payload.repository.name;
   const ownerLogin = payload.repository.owner.login;
+  const ref = payload.ref.replace('refs/heads/', '');
 
   await c.env.kv.put(
-    `${ownerLogin}/${repoName}`,
+    `${ownerLogin}/${repoName}/${ref}`,
     JSON.stringify({
       installationId: payload.installation.id,
     }),
@@ -78,7 +79,7 @@ app.post('/github/webhook', async (c) => {
     event_type: 'build-docs',
     client_payload: {
       repo: `${ownerLogin}/${repoName}`,
-      ref: payload.ref.replace('refs/heads/', ''),
+      ref,
     },
   });
 
@@ -99,7 +100,7 @@ app.get(
     const { owner, repo, ref } = c.req.valid('param');
 
     const { installationId } = await c.env.kv.get<{ installationId: number }>(
-      `${owner}/${repo}`,
+      `${owner}/${repo}/${ref}`,
       {
         type: 'json',
       },

@@ -1,15 +1,20 @@
 import { Command } from '@cliffy/command';
 import { build } from './build.ts';
 import { deploy } from './deploy.ts';
+import { download } from './download.ts';
 
 await new Command()
   .name('docio')
   .description('Docio CLI')
   .version('v0.0.0')
   .command('build', 'Build the project')
+  .action(async () => {
+    await build();
+  })
+  .command('download', 'Download the project')
   .arguments('<repo> <ref>')
   .action(async (_, repo, ref) => {
-    await build(repo, ref);
+    await download(repo, ref);
   })
   .command('deploy', 'Deploy the project')
   .env('CLOUDFLARE_API_TOKEN=<string>', 'Cloudflare API token', {
@@ -21,8 +26,8 @@ await new Command()
   .env('CLOUDFLARE_ZONE_ID=<string>', 'Cloudflare zone ID', {
     required: true,
   })
-  .arguments('<repo>')
-  .action(async (_, repo) => {
-    await deploy(repo);
+  .arguments('<repo> <ref>')
+  .action(async (_, repo, ref) => {
+    await deploy(repo, ref);
   })
   .parse(Deno.args);
