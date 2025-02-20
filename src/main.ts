@@ -66,6 +66,7 @@ app.post(
       repository: z.object({
         name: z.string(),
         owner: z.object({ login: z.string() }),
+        default_branch: z.string(),
       }),
       ref: z.string(),
       installation: z.object({ id: z.number() }),
@@ -80,9 +81,14 @@ app.post(
       'refs/tags/',
       '',
     );
+    const defaultBranch = payload.repository.default_branch;
+
+    if (ref !== defaultBranch) {
+      return c.json({ message: 'Skipping non-default branch' }, 200);
+    }
 
     await c.env.kv.put(
-      `${ownerLogin}/${repoName}/${ref}`,
+      `${ownerLogin}/${repoName}`,
       JSON.stringify({
         installationId: payload.installation.id,
       }),
@@ -99,6 +105,7 @@ app.post(
       client_payload: {
         repo: `${ownerLogin}/${repoName}`,
         ref,
+        defaultBranch,
       },
     });
 
@@ -135,7 +142,7 @@ app.get(
     const { owner, repo, ref } = c.req.valid('param');
 
     const { installationId } = await c.env.kv.get<{ installationId: number }>(
-      `${owner}/${repo}/${ref}`,
+      `${owner}/${repo}`,
       {
         type: 'json',
       },

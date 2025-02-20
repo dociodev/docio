@@ -5,8 +5,14 @@ import { $ } from '@david/dax';
 export async function deploy(
   repo: string,
   ref: string,
+  defaultBranch: string,
 ) {
   const slug = slugify(`${repo}/${ref}`);
+
+  const subdomainSlug = slugify(
+    (repo.endsWith('/docio') ? repo.replace('/docio', '') : repo) +
+      (ref === defaultBranch ? '' : `-${ref}`),
+  );
 
   const cloudflare = new Cloudflare({
     apiToken: Deno.env.get('CLOUDFLARE_API_TOKEN')!,
@@ -15,6 +21,8 @@ export async function deploy(
   const project = await cloudflare.pages.projects.get(slug, {
     account_id: Deno.env.get('CLOUDFLARE_ACCOUNT_ID')!,
   }).catch(() => null);
+
+  console.log(project);
 
   if (!project) {
     await cloudflare.pages.projects.create({
@@ -40,7 +48,7 @@ export async function deploy(
 
   const domains = await cloudflare.pages.projects.domains.get(
     slug,
-    `${slug}.docio.dev`,
+    `${subdomainSlug}.docio.dev`,
     {
       account_id: Deno.env.get('CLOUDFLARE_ACCOUNT_ID')!,
     },
@@ -50,7 +58,7 @@ export async function deploy(
     await cloudflare.pages.projects.domains.create(
       slug,
       {
-        name: `${slug}.docio.dev`,
+        name: `${subdomainSlug}.docio.dev`,
         account_id: Deno.env.get('CLOUDFLARE_ACCOUNT_ID')!,
       },
     );
@@ -59,7 +67,7 @@ export async function deploy(
   const dnsRecords = await cloudflare.dns.records.list({
     zone_id: Deno.env.get('CLOUDFLARE_ZONE_ID')!,
     name: {
-      exact: `${slug}.docio.dev`,
+      exact: `${subdomainSlug}.docio.dev`,
     },
     type: 'CNAME',
   });
@@ -68,7 +76,7 @@ export async function deploy(
     await cloudflare.dns.records.create({
       zone_id: Deno.env.get('CLOUDFLARE_ZONE_ID')!,
       content: `${slug}.pages.dev`,
-      name: slug,
+      name: subdomainSlug,
       proxied: true,
       type: 'CNAME',
     });
