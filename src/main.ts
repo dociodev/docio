@@ -83,6 +83,10 @@ app.post(
     );
     const defaultBranch = payload.repository.default_branch;
 
+    if (repoName !== 'docio') {
+      return c.json({ message: 'Skipping non-docio repo' }, 200);
+    }
+
     if (ref !== defaultBranch) {
       return c.json({ message: 'Skipping non-default branch' }, 200);
     }
