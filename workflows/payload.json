@@ -1,5 +1,6 @@
 {
   "client_payload": {
-    "repo": "IKatsuba/rspress-docs"
+    "repo": "IKatsuba/rspress-docs",
+    "downloadUrl": "https://github.com/IKatsuba/rspress-docs/archive/refs/heads/main.tar.gz"
   }
 }

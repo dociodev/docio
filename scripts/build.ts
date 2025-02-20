@@ -4,9 +4,11 @@ import { $ } from '@david/dax';
 
 export async function build(
   repo: string,
+  ref: string,
+  installationId: string,
 ) {
   const response = await fetch(
-    `https://local-docio.ktsb.io/${repo}`,
+    `${Deno.env.get('WORKER_URL')}/${installationId}/${repo}/${ref}`,
   );
 
   if (!response.ok) {

@@ -1,5 +1,8 @@
 import { Hono } from 'hono';
 import { App } from '@octokit/app';
+import { Octokit } from '@octokit/core';
+import { zValidator } from '@hono/zod-validator';
+import { z } from 'zod';
 
 const app = new Hono<
   {
@@ -7,6 +10,7 @@ const app = new Hono<
       GITHUB_WEBHOOK_SECRET: string;
       GITHUB_PRIVATE_KEY: string;
       GITHUB_APP_ID: string;
+      GITHUB_PERSONAL_ACCESS_TOKEN: string;
       reposBucket: R2Bucket;
     };
   }
@@ -57,78 +61,83 @@ app.post('/github/webhook', async (c) => {
   const repoName = payload.repository.name;
   const ownerLogin = payload.repository.owner.login;
 
-  const app = new App({
-    privateKey: c.env.GITHUB_PRIVATE_KEY!,
-    appId: c.env.GITHUB_APP_ID!,
-    webhooks: {
-      secret: c.env.GITHUB_WEBHOOK_SECRET!,
-    },
+  const personalOctokit = new Octokit({
+    auth: c.env.GITHUB_PERSONAL_ACCESS_TOKEN,
   });
 
-  const octokit = await app.getInstallationOctokit(payload.installation.id);
-
-  const { token } = await octokit.auth({
-    type: 'installation',
-    installationId: payload.installation.id,
-  }) as { token: string };
-
-  const repoZip = await fetch(
-    `https://api.github.com/repos/${ownerLogin}/${repoName}/tarball/${
-      payload.ref.replace('refs/heads/', '')
-    }`,
-    {
-      redirect: 'follow',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-        'User-Agent': 'Docio Dev Local',
-      },
-    },
-  );
-
-  if (!repoZip.ok) {
-    console.error(
-      `Failed to fetch repo zip for ${ownerLogin}/${repoName}. Status: ${repoZip.status}`,
-    );
-    console.error(await repoZip.text());
-
-    return c.json({ message: 'Failed to fetch repo zip' }, 500);
-  }
-
-  console.log(`Status: ${repoZip.status}`);
-
-  await c.env.reposBucket.put(`${ownerLogin}/${repoName}`, repoZip.body);
-
-  await octokit.request('POST /repos/{owner}/{repo}/dispatches', {
-    owner: ownerLogin,
-    repo: repoName,
+  await personalOctokit.request('POST /repos/{owner}/{repo}/dispatches', {
+    owner: 'IKatsuba',
+    repo: 'docio',
     event_type: 'build-docs',
     client_payload: {
       repo: `${ownerLogin}/${repoName}`,
+      installationId: payload.installation.id,
+      ref: payload.ref.replace('refs/heads/', ''),
     },
   });
 
   return c.json({});
 });
 
-app.get('/:owner/:repo', async (c) => {
-  const owner = c.req.param('owner');
-  const repo = c.req.param('repo');
+app.get(
+  '/:installationId/:owner/:repo/:ref',
+  zValidator(
+    'param',
+    z.object({
+      installationId: z.coerce.number(),
+      owner: z.string(),
+      repo: z.string(),
+      ref: z.string(),
+    }),
+  ),
+  async (c) => {
+    const { installationId, owner, repo, ref } = c.req.valid('param');
 
-  const object = await c.env.reposBucket.get(`${owner}/${repo}`);
+    const app = new App({
+      privateKey: c.env.GITHUB_PRIVATE_KEY!,
+      appId: c.env.GITHUB_APP_ID!,
+      webhooks: {
+        secret: c.env.GITHUB_WEBHOOK_SECRET!,
+      },
+    });
 
-  if (!object) {
-    return c.json({ message: 'Not found' }, 404);
-  }
+    const octokit = await app.getInstallationOctokit(installationId);
 
-  const headers = new Headers();
-  object.writeHttpMetadata(headers);
-  headers.set('etag', object.httpEtag);
+    const { token } = await octokit.auth({
+      type: 'installation',
+      installationId,
+    }) as { token: string };
 
-  return new Response(object.body, {
-    headers,
-  });
-});
+    const getTarballResponse = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/tarball/${ref}`,
+      {
+        redirect: 'manual',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+          'User-Agent': 'Docio Dev Local',
+        },
+      },
+    );
+
+    if (getTarballResponse.status !== 302) {
+      console.error(
+        `Failed to fetch repo zip for ${owner}/${repo}. Status: ${getTarballResponse.status}`,
+      );
+      console.error(await getTarballResponse.text());
+
+      return c.json({ message: 'Failed to fetch repo zip' }, 500);
+    }
+
+    const downloadUrl = getTarballResponse.headers.get('Location');
+
+    if (!downloadUrl) {
+      return c.json({ message: 'No tarball URL' }, 500);
+    }
+
+    return fetch(downloadUrl);
+  },
+);
 
 export default app;

@@ -7,9 +7,9 @@ await new Command()
   .description('Docio CLI')
   .version('v0.0.0')
   .command('build', 'Build the project')
-  .arguments('<repo>')
-  .action(async (_, repo) => {
-    await build(repo);
+  .arguments('<repo> <ref> <installationId>')
+  .action(async (_, repo, ref, installationId) => {
+    await build(repo, ref, installationId);
   })
   .command('deploy', 'Deploy the project')
   .env('CLOUDFLARE_API_TOKEN=<string>', 'Cloudflare API token', {
