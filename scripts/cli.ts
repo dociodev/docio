@@ -8,16 +8,16 @@ await new Command()
   .description('Docio CLI')
   .version('v0.0.0')
   .command('build', 'Build the project')
+  .action(async () => {
+    await build();
+  })
+  .command('download', 'Download the project')
   .env('WORKER_SECRET=<string>', 'Worker secret', {
     required: true,
   })
   .env('WORKER_URL=<string>', 'Worker URL', {
     required: true,
   })
-  .action(async () => {
-    await build();
-  })
-  .command('download', 'Download the project')
   .arguments('<repo> <ref>')
   .action(async (_, repo, ref) => {
     await download(repo, ref);
