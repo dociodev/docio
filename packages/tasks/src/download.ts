@@ -6,7 +6,7 @@ export async function download(
   ref: string,
 ) {
   const response = await fetch(
-    `${Deno.env.get('WORKER_URL')}/${repo}/${ref}`,
+    `${Deno.env.get('WORKER_URL')}/api/github/${repo}/${ref}`,
     {
       headers: {
         'X-Worker-Secret': Deno.env.get('WORKER_SECRET')!,
