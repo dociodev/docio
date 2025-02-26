@@ -5,6 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 import honox from 'honox/vite';
 
 export default defineConfig({
+  ssr: {
+    external: ['fast-content-type-parse'],
+  },
   plugins: [
     honox({
       devServer: { adapter },
