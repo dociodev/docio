@@ -1,17 +1,11 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
-  "name": "docio",
-  "main": "src/main.ts",
+  "name": "docio-worker",
+  "main": "main.ts",
   "compatibility_flags": ["nodejs_compat"],
   "compatibility_date": "2025-02-04",
   "observability": {
     "enabled": true
   },
-  "kv_namespaces": [
-    {
-      "binding": "kv",
-      "id": "bd8a09c88d0c4611a0cf12e82117270b"
-    }
-  ],
   "tsconfig": "./tsconfig.wrangler.json"
 }
