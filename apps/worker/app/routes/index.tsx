@@ -203,4 +203,20 @@ app.get(
   },
 );
 
+app.get('/', (c) => {
+  return c.render(<>
+    <Header />
+    <main>
+      <Hero />
+      <PrimaryFeatures />
+      <SecondaryFeatures />
+      <CallToAction />
+      <Testimonials />
+      <Pricing />
+      <Faqs />
+    </main>
+    <Footer />
+  </>);
+});
+
 export default app;

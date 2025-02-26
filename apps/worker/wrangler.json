@@ -1,11 +1,11 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "docio-worker",
-  "main": "src/main.ts",
+  "main": "dist/index.js",
   "compatibility_flags": ["nodejs_compat"],
   "compatibility_date": "2025-02-04",
   "observability": {
     "enabled": true
   },
-  "tsconfig": "./tsconfig.wrangler.json"
+  "tsconfig": "./tsconfig.json"
 }
