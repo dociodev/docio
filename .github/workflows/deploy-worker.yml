@@ -22,8 +22,10 @@ jobs:
       - name: Install dependencies
         run: deno install --allow-scripts
 
-      - name: Deploy
-        run: deno task -r wrangler deploy
+      - name: Build and Deploy
+        run: |
+          deno task -r build
+          deno task -r wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
