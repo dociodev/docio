@@ -1,6 +1,10 @@
 {
   "tasks": {
-    "dev": "deno task -r -f @docio/worker dev"
+    "dev": {
+      "dependencies": ["dev:worker", "dev:octomock"]
+    },
+    "dev:worker": "deno task -r -f @docio/worker dev",
+    "dev:octomock": "deno task -r -f @docio/octomock dev"
   },
   "imports": {},
   "nodeModulesDir": "auto",

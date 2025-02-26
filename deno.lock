@@ -3553,6 +3553,11 @@
   },
   "workspace": {
     "members": {
+      "apps/octomock": {
+        "dependencies": [
+          "jsr:@david/dax@0.42"
+        ]
+      },
       "apps/worker": {
         "dependencies": [
           "npm:@cloudflare/workers-types@^4.20250204.0",
