@@ -40,7 +40,7 @@ app.post(
     'header',
     z.object({
       'X-Hub-Signature-256': z.string(),
-      'X-GitHub-Event': z.enum(['push']),
+      'X-GitHub-Event': z.enum(['push', 'installation']),
     }),
   ),
   async (c, next) => {

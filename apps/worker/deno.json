@@ -17,6 +17,7 @@
   "imports": {
     "@cloudflare/workers-types": "npm:@cloudflare/workers-types@^4.20250204.0",
     "@hono/zod-validator": "npm:@hono/zod-validator@^0.4.3",
+    "@octojs/app": "jsr:@octojs/app@^0.0.1",
     "@octokit/app": "npm:@octokit/app@^15.1.3",
     "@octokit/core": "npm:@octokit/core@^6.1.4",
     "wrangler": "npm:wrangler@^3.110.0",
