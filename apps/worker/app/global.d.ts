@@ -10,6 +10,7 @@ declare module 'hono' {
       GITHUB_PERSONAL_ACCESS_TOKEN: string;
       WORKER_SECRET: string;
       kv: KVNamespace;
+      db: D1Database;
     };
   }
 }

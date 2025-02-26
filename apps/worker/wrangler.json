@@ -11,5 +11,13 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS"
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "db",
+      "database_name": "docio-db",
+      "database_id": "2348446e-5f37-4706-a252-41e1445ace39",
+      "migrations_dir": "../../packages/db/migrations"
+    }
+  ]
 }

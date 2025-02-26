@@ -1,0 +1,11 @@
+{
+  "name": "@docio/db",
+  "version": "0.0.1",
+  "exports": {},
+  "imports": {
+    "prisma": "npm:prisma@^6.4.1"
+  },
+  "tasks": {
+    "prisma": "prisma"
+  }
+}
