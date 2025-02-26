@@ -16,16 +16,21 @@
   "exports": {},
   "imports": {
     "@cloudflare/workers-types": "npm:@cloudflare/workers-types@^4.20250204.0",
+    "@hono/vite-build": "npm:@hono/vite-build@^1.3.0",
+    "@hono/vite-dev-server": "npm:@hono/vite-dev-server@^0.18.2",
     "@hono/zod-validator": "npm:@hono/zod-validator@^0.4.3",
     "@octojs/app": "jsr:@octojs/app@^0.0.1",
     "@octokit/app": "npm:@octokit/app@^15.1.3",
     "@octokit/core": "npm:@octokit/core@^6.1.4",
+    "vite": "npm:vite@^6.2.0",
     "wrangler": "npm:wrangler@^3.110.0",
     "hono": "npm:hono@^4.7.1",
     "zod": "npm:zod@^3.24.2"
   },
   "tasks": {
     "wrangler": "node ../../node_modules/.bin/wrangler",
-    "dev": "deno task wrangler dev --port 8786 main.ts"
+    "dev": "deno task vite",
+    "vite": "node ../../node_modules/.bin/vite",
+    "build": "deno task vite build"
   }
 }
