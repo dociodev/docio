@@ -25,16 +25,16 @@ jobs:
         run: deno install --allow-scripts
 
       - name: Download documentation
-        run: deno task docio download ${{ github.event.client_payload.repo }} ${{ github.event.client_payload.ref }}
+        run: deno task -r docio download ${{ github.event.client_payload.repo }} ${{ github.event.client_payload.ref }}
         env:
           WORKER_URL: https://docio.katsuba.workers.dev
           WORKER_SECRET: ${{ secrets.WORKER_SECRET }}
 
       - name: Build documentation
-        run: deno task docio build
+        run: deno task -r docio build
 
       - name: Deploy to Cloudflare Pages
-        run: deno task docio deploy ${{ github.event.client_payload.repo }} ${{ github.event.client_payload.ref }} ${{ github.event.client_payload.defaultBranch }}
+        run: deno task -r docio deploy ${{ github.event.client_payload.repo }} ${{ github.event.client_payload.ref }} ${{ github.event.client_payload.defaultBranch }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

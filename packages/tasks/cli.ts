@@ -1,7 +1,7 @@
 import { Command } from '@cliffy/command';
-import { build } from './build.ts';
-import { deploy } from './deploy.ts';
-import { download } from './download.ts';
+import { build } from './src/build.ts';
+import { deploy } from './src/deploy.ts';
+import { download } from './src/download.ts';
 
 await new Command()
   .name('docio')
