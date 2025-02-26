@@ -4,9 +4,9 @@ import build from '@hono/vite-build/cloudflare-workers';
 import tailwindcss from '@tailwindcss/vite';
 import honox from 'honox/vite';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   ssr: {
-    external: ['fast-content-type-parse'],
+    external: command === 'serve' ? ['fast-content-type-parse'] : undefined,
   },
   plugins: [
     honox({
@@ -16,4 +16,4 @@ export default defineConfig({
     tailwindcss() as any,
     build(),
   ],
-});
+}));

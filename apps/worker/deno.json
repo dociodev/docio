@@ -32,7 +32,7 @@
   },
   "tasks": {
     "wrangler": "node ../../node_modules/.bin/wrangler",
-    "dev": "deno task vite",
+    "dev": "deno task vite --port 8786",
     "vite": "node ../../node_modules/.bin/vite",
     "build": "deno task vite build --mode client && deno task vite build && cp ./.assetsignore ./dist"
   }
