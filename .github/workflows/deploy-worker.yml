@@ -25,7 +25,6 @@ jobs:
       - name: Build and Deploy
         run: |
           deno task -r db client generate
-          deno task -r build
           deno task -r db migrations up --remote
           deno task -r wrangler deploy
         env:
