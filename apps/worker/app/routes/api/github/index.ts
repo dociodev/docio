@@ -51,29 +51,21 @@ app.post(
 
     await next();
   },
-  on('push', async (event, c) => {
-    const repoName = event.repository.name;
-    const ownerLogin = event.repository.owner.login;
-    const ref = event.ref.replace('refs/heads/', '').replace(
+  on('push', async ({ repository, ref }, c) => {
+    const repoName = repository.name;
+    const normalizedRef = ref.replace('refs/heads/', '').replace(
       'refs/tags/',
       '',
     );
-    const defaultBranch = event.repository.default_branch;
+    const defaultBranch = repository.default_branch;
 
     if (repoName !== 'docio') {
       return c.json({ message: 'Skipping non-docio repo' }, 200);
     }
 
-    if (ref !== defaultBranch) {
+    if (normalizedRef !== defaultBranch) {
       return c.json({ message: 'Skipping non-default branch' }, 200);
     }
-
-    await c.env.kv.put(
-      `${ownerLogin}/${repoName}`,
-      JSON.stringify({
-        installationId: event.installation?.id,
-      }),
-    );
 
     const personalOctokit = new Octokit({
       auth: c.env.GITHUB_PERSONAL_ACCESS_TOKEN,
@@ -84,27 +76,27 @@ app.post(
       repo: 'hosting',
       event_type: 'build-docs',
       client_payload: {
-        repo: `${ownerLogin}/${repoName}`,
-        ref,
+        repo: repository.full_name,
+        ref: normalizedRef,
         defaultBranch,
       },
     });
 
     return c.json({});
   }),
-  on('installation.created', async (event, c) => {
+  on('installation.created', async ({ installation, repositories }, c) => {
     const db = createDbClient(c.env.db);
 
     await db.installation.create({
       data: {
-        installationId: event.installation.id,
+        installationId: installation.id,
         repositories: {
-          create: event.repositories?.map((repo) => ({
+          create: repositories?.map((repo) => ({
             githubId: repo.id,
             name: repo.name,
             fullName: repo.full_name,
             private: repo.private,
-          })),
+          })) ?? [],
         },
       },
     });
@@ -139,12 +131,20 @@ app.get(
   async (c) => {
     const { owner, repo, ref } = c.req.valid('param');
 
-    const { installationId } = await c.env.kv.get<{ installationId: number }>(
-      `${owner}/${repo}`,
-      {
-        type: 'json',
+    const db = createDbClient(c.env.db);
+
+    const { installationId } = (await db.installation.findFirst({
+      where: {
+        repositories: {
+          some: {
+            fullName: `${owner}/${repo}`,
+          },
+        },
       },
-    ) ?? { installationId: undefined };
+      select: {
+        installationId: true,
+      },
+    })) ?? { installationId: undefined };
 
     if (!installationId) {
       return c.json({ message: 'Not found' }, 404);
