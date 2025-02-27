@@ -101,6 +101,7 @@ app.post(
       },
     });
   }),
+  (c) => c.json({}),
 );
 
 app.get(
