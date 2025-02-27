@@ -16,12 +16,6 @@
       "migrations_dir": "../../packages/db/migrations"
     }
   ],
-  "routes": [
-    {
-      "pattern": "docio.dev/api/*",
-      "zone_name": "docio.dev"
-    }
-  ],
   "alias": {
     "@docio/db": "../../packages/db/mod.ts",
     "@docio/octo": "../../packages/octo/mod.ts"
