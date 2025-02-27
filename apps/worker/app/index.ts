@@ -61,6 +61,10 @@ app.post(
 
     await next();
   },
+  on('ping', async (_event, c) => {
+    console.log('Ping received');
+    return c.json({ message: 'Pong' }, 200);
+  }),
   on('push', async ({ repository, ref }, c) => {
     const repoName = repository.name;
     const normalizedRef = ref.replace('refs/heads/', '').replace(
@@ -114,6 +118,34 @@ app.post(
       })) ?? [],
     });
   }),
+  // on('installation.deleted', async ({ installation }, c) => {
+  //   const db = createDbClient(c.env.db);
+
+  //   const { id } = (await db.installation.findFirst({
+  //     where: {
+  //       installationId: installation.id,
+  //     },
+  //     select: {
+  //       id: true,
+  //     },
+  //   })) ?? {};
+
+  //   if (!id) {
+  //     return c.json({ message: 'Installation not found' }, 404);
+  //   }
+
+  //   await db.repository.deleteMany({
+  //     where: {
+  //       installationId: id,
+  //     },
+  //   });
+
+  //   await db.installation.delete({
+  //     where: {
+  //       id,
+  //     },
+  //   });
+  // }),
   (c) => c.json({}),
 );
 
