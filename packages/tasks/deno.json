@@ -11,6 +11,10 @@
     "rspress": "npm:rspress@^1.41.2"
   },
   "tasks": {
-    "docio": "deno run --allow-net --allow-write --allow-read --allow-env --allow-run cli.ts"
+    "docio": "deno run --allow-net --allow-write --allow-read --allow-env --allow-run cli.ts",
+    "test": "deno test"
+  },
+  "test": {
+    "include": ["src/**/*.spec.ts"]
   }
 }
