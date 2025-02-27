@@ -6,7 +6,16 @@ import { Octokit } from '@octokit/core';
 import { on } from '@docio/octo';
 import { createDbClient } from '@docio/db';
 
-const app = new Hono();
+const app = new Hono<{
+  Bindings: {
+    GITHUB_WEBHOOK_SECRET: string;
+    GITHUB_PRIVATE_KEY: string;
+    GITHUB_APP_ID: string;
+    GITHUB_PERSONAL_ACCESS_TOKEN: string;
+    WORKER_SECRET: string;
+    db: D1Database;
+  };
+}>();
 
 async function signRequestBody(secret: string, body: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -26,7 +35,7 @@ async function signRequestBody(secret: string, body: string): Promise<string> {
 }
 
 app.post(
-  '/webhook',
+  '/api/github/webhook',
   zValidator(
     'header',
     z.object({
@@ -105,7 +114,7 @@ app.post(
 );
 
 app.get(
-  '/:owner/:repo/:ref',
+  '/api/github/:owner/:repo/:ref',
   zValidator(
     'header',
     z.object({

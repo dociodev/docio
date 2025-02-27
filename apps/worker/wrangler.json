@@ -1,23 +1,25 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "docio-worker",
-  "main": "dist/index.js",
+  "main": "app/index.ts",
   "compatibility_flags": ["nodejs_compat"],
   "compatibility_date": "2025-02-04",
   "observability": {
     "enabled": true
   },
   "tsconfig": "./tsconfig.json",
-  "assets": {
-    "directory": "./dist",
-    "binding": "ASSETS"
-  },
   "d1_databases": [
     {
       "binding": "db",
       "database_name": "docio-db",
       "database_id": "2348446e-5f37-4706-a252-41e1445ace39",
       "migrations_dir": "../../packages/db/migrations"
+    }
+  ],
+  "routes": [
+    {
+      "pattern": "docio.dev/api/*",
+      "zone_name": "docio.dev"
     }
   ]
 }
