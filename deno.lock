@@ -28,6 +28,8 @@
     "npm:@octokit/app@^15.1.3": "15.1.5_@octokit+core@6.1.4",
     "npm:@octokit/core@^6.1.4": "6.1.4",
     "npm:@octokit/webhooks-types@^7.6.1": "7.6.1",
+    "npm:@prisma/adapter-d1@^6.4.1": "6.4.1",
+    "npm:@prisma/client@^6.4.1": "6.4.1_prisma@6.4.1__esbuild@0.25.0",
     "npm:@tailwindcss/vite@^4.0.9": "4.0.9_vite@6.2.0_lightningcss@1.29.1",
     "npm:@types/node@*": "22.12.0",
     "npm:cloudflare@^4.1.0": "4.1.0",
@@ -240,6 +242,9 @@
     },
     "@cloudflare/workerd-windows-64@1.20250214.0": {
       "integrity": "sha512-GMwMyFbkjBKjYJoKDhGX8nuL4Gqe3IbVnVWf2Q6086CValyIknupk5J6uQWGw2EBU3RGO3x4trDXT5WphQJZDQ=="
+    },
+    "@cloudflare/workers-types@4.20240614.0": {
+      "integrity": "sha512-fnV3uXD1Hpq5EWnY7XYb+smPcjzIoUFiZpTSV/Tk8qKL3H+w6IqcngZwXQBZ/2U/DwYkDilXHW3FfPhnyD7FZA=="
     },
     "@cloudflare/workers-types@4.20250224.0": {
       "integrity": "sha512-j6ZwQ5G2moQRaEtGI2u5TBQhVXv/XwOS5jfBAheZHcpCM07zm8j0i8jZHHLq/6VA8e6VRjKohOyj5j6tZ1KHLQ=="
@@ -843,8 +848,27 @@
         "@octokit/webhooks-methods"
       ]
     },
+    "@prisma/adapter-d1@6.4.1": {
+      "integrity": "sha512-Bg0fOkujcWVC0oDv+Qb8O8Qk7Y8KY19TEVtPqoiZEigqTVbD0QArsMOHx6mgeIOG5w42H2MHYR4zjiYkzj8NiQ==",
+      "dependencies": [
+        "@cloudflare/workers-types@4.20240614.0",
+        "@prisma/driver-adapter-utils"
+      ]
+    },
+    "@prisma/client@6.4.1_prisma@6.4.1__esbuild@0.25.0": {
+      "integrity": "sha512-A7Mwx44+GVZVexT5e2GF/WcKkEkNNKbgr059xpr5mn+oUm2ZW1svhe+0TRNBwCdzhfIZ+q23jEgsNPvKD9u+6g==",
+      "dependencies": [
+        "prisma"
+      ]
+    },
     "@prisma/debug@6.4.1": {
       "integrity": "sha512-Q9xk6yjEGIThjSD8zZegxd5tBRNHYd13GOIG0nLsanbTXATiPXCLyvlYEfvbR2ft6dlRsziQXfQGxAgv7zcMUA=="
+    },
+    "@prisma/driver-adapter-utils@6.4.1": {
+      "integrity": "sha512-WIVq6QUzz9HJXNa+6LmyLrW/KHOFQwmXYvpaVVECjwAUaAQXFw4g85i68GFPTYrfozwz5CntdHVVzXxInkk0fA==",
+      "dependencies": [
+        "@prisma/debug"
+      ]
     },
     "@prisma/engines-version@6.4.0-29.a9055b89e58b4b5bfb59600785423b1db3d0e75d": {
       "integrity": "sha512-Xq54qw55vaCGrGgIJqyDwOq0TtjZPJEWsbQAHugk99hpDf2jcEeQhUcF+yzEsSqegBaDNLA4IC8Nn34sXmkiTQ=="
@@ -4420,7 +4444,7 @@
       "integrity": "sha512-ldTaxtcYozSHo8QRcxTQUckO9C7zSZgG0/AMCqFLdKK7fYLFPWEwmbnh+gxzlxzWEMfa8fV/5NtR0k2bCBxAoA==",
       "dependencies": [
         "@cloudflare/kv-asset-handler",
-        "@cloudflare/workers-types",
+        "@cloudflare/workers-types@4.20250224.0",
         "@esbuild-plugins/node-globals-polyfill",
         "@esbuild-plugins/node-modules-polyfill",
         "blake3-wasm",
@@ -4484,6 +4508,10 @@
       },
       "packages/db": {
         "dependencies": [
+          "jsr:@cliffy/command@^1.0.0-rc.7",
+          "jsr:@david/dax@0.42",
+          "npm:@prisma/adapter-d1@^6.4.1",
+          "npm:@prisma/client@^6.4.1",
           "npm:prisma@^6.4.1"
         ]
       },
