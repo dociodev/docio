@@ -1,0 +1,12 @@
+{
+  "name": "@docio/octo",
+  "version": "0.0.1",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "imports": {
+    "@octokit/webhooks-types": "npm:@octokit/webhooks-types@^7.6.1",
+    "hono": "npm:hono@^4.7.2"
+  },
+  "tasks": {}
+}

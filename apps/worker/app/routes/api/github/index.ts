@@ -3,6 +3,8 @@ import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { App } from '@octokit/app';
 import { Octokit } from '@octokit/core';
+import { on } from '@docio/octo';
+import { createDbClient } from '@docio/db';
 
 const app = new Hono();
 
@@ -29,7 +31,7 @@ app.post(
     'header',
     z.object({
       'X-Hub-Signature-256': z.string(),
-      'X-GitHub-Event': z.enum(['push', 'installation']),
+      'X-GitHub-Event': z.string(),
     }),
   ),
   async (c, next) => {
@@ -49,28 +51,14 @@ app.post(
 
     await next();
   },
-  zValidator(
-    'json',
-    z.object({
-      repository: z.object({
-        name: z.string(),
-        owner: z.object({ login: z.string() }),
-        default_branch: z.string(),
-      }),
-      ref: z.string(),
-      installation: z.object({ id: z.number() }),
-    }),
-  ),
-  async (c) => {
-    const payload = c.req.valid('json');
-
-    const repoName = payload.repository.name;
-    const ownerLogin = payload.repository.owner.login;
-    const ref = payload.ref.replace('refs/heads/', '').replace(
+  on('push', async (event, c) => {
+    const repoName = event.repository.name;
+    const ownerLogin = event.repository.owner.login;
+    const ref = event.ref.replace('refs/heads/', '').replace(
       'refs/tags/',
       '',
     );
-    const defaultBranch = payload.repository.default_branch;
+    const defaultBranch = event.repository.default_branch;
 
     if (repoName !== 'docio') {
       return c.json({ message: 'Skipping non-docio repo' }, 200);
@@ -83,7 +71,7 @@ app.post(
     await c.env.kv.put(
       `${ownerLogin}/${repoName}`,
       JSON.stringify({
-        installationId: payload.installation.id,
+        installationId: event.installation?.id,
       }),
     );
 
@@ -103,7 +91,24 @@ app.post(
     });
 
     return c.json({});
-  },
+  }),
+  on('installation.created', async (event, c) => {
+    const db = createDbClient(c.env.db);
+
+    await db.installation.create({
+      data: {
+        installationId: event.installation.id,
+        repositories: {
+          create: event.repositories?.map((repo) => ({
+            githubId: repo.id,
+            name: repo.name,
+            fullName: repo.full_name,
+            private: repo.private,
+          })),
+        },
+      },
+    });
+  }),
 );
 
 app.get(
