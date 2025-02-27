@@ -6,6 +6,6 @@
     "@david/dax": "jsr:@david/dax@^0.42.0"
   },
   "tasks": {
-    "dev": "deno serve --port 8001 -A main.ts"
+    "dev": "deno serve --watch --env-file=../../.env --port 8001 -A main.ts"
   }
 }

@@ -21,5 +21,9 @@
       "pattern": "docio.dev/api/*",
       "zone_name": "docio.dev"
     }
-  ]
+  ],
+  "alias": {
+    "@docio/db": "../../packages/db/mod.ts",
+    "@docio/octo": "../../packages/octo/mod.ts"
+  }
 }

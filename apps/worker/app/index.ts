@@ -8,11 +8,12 @@ import { createDbClient } from '@docio/db';
 
 const app = new Hono<{
   Bindings: {
-    GITHUB_WEBHOOK_SECRET: string;
-    GITHUB_PRIVATE_KEY: string;
+    GITHUB_APP_WEBHOOK_SECRET: string;
+    GITHUB_APP_PRIVATE_KEY: string;
     GITHUB_APP_ID: string;
     GITHUB_PERSONAL_ACCESS_TOKEN: string;
     WORKER_SECRET: string;
+    OCTOMOCK_URL?: string;
     db: D1Database;
   };
 }>();
@@ -53,7 +54,7 @@ app.post(
     }
 
     if (
-      await signRequestBody(c.env.GITHUB_WEBHOOK_SECRET, body) !== signature
+      await signRequestBody(c.env.GITHUB_APP_WEBHOOK_SECRET, body) !== signature
     ) {
       return c.json({ message: 'Invalid signature' }, 400);
     }
@@ -78,6 +79,7 @@ app.post(
 
     const personalOctokit = new Octokit({
       auth: c.env.GITHUB_PERSONAL_ACCESS_TOKEN,
+      baseUrl: c.env.OCTOMOCK_URL || undefined,
     });
 
     await personalOctokit.request('POST /repos/{owner}/{repo}/dispatches', {
@@ -96,18 +98,20 @@ app.post(
   on('installation.created', async ({ installation, repositories }, c) => {
     const db = createDbClient(c.env.db);
 
-    await db.installation.create({
+    const createdInstallation = await db.installation.create({
       data: {
         installationId: installation.id,
-        repositories: {
-          create: repositories?.map((repo) => ({
-            githubId: repo.id,
-            name: repo.name,
-            fullName: repo.full_name,
-            private: repo.private,
-          })) ?? [],
-        },
       },
+    });
+
+    await db.repository.createMany({
+      data: repositories?.map((repo) => ({
+        installationId: createdInstallation.id,
+        githubId: repo.id,
+        name: repo.name,
+        fullName: repo.full_name,
+        private: repo.private,
+      })) ?? [],
     });
   }),
   (c) => c.json({}),
@@ -143,36 +147,37 @@ app.get(
 
     const db = createDbClient(c.env.db);
 
-    const { installationId } = (await db.installation.findFirst({
+    const repository = await db.repository.findFirst({
       where: {
-        repositories: {
-          some: {
-            fullName: `${owner}/${repo}`,
-          },
-        },
+        fullName: `${owner}/${repo}`,
       },
       select: {
-        installationId: true,
+        installation: true,
       },
-    })) ?? { installationId: undefined };
+    });
 
-    if (!installationId) {
+    if (!repository || !repository.installation) {
+      console.error(
+        `Repository ${owner}/${repo} not found or has no installation ID`,
+      );
       return c.json({ message: 'Not found' }, 404);
     }
 
     const app = new App({
-      privateKey: c.env.GITHUB_PRIVATE_KEY!,
+      privateKey: c.env.GITHUB_APP_PRIVATE_KEY!,
       appId: c.env.GITHUB_APP_ID!,
       webhooks: {
-        secret: c.env.GITHUB_WEBHOOK_SECRET!,
+        secret: c.env.GITHUB_APP_WEBHOOK_SECRET!,
       },
     });
 
-    const octokit = await app.getInstallationOctokit(installationId);
+    const octokit = await app.getInstallationOctokit(
+      repository.installation.installationId,
+    );
 
     const { token } = await octokit.auth({
       type: 'installation',
-      installationId,
+      installationId: repository.installation.installationId,
     }) as { token: string };
 
     const getTarballResponse = await fetch(
