@@ -2,21 +2,14 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { App } from '@octokit/app';
-import { Octokit } from '@octokit/core';
-import { on } from '@docio/octo';
+import type { Env } from '@docio/env';
 import { createDbClient } from '@docio/db';
+import { pushHandler } from './github-webhooks/push.ts';
+import { installationCreatedHandler } from './github-webhooks/installation.created.ts';
+import { pingHandler } from './github-webhooks/ping.ts';
+import { installationDeletedHandler } from './github-webhooks/installation.deleted.ts';
 
-const app = new Hono<{
-  Bindings: {
-    GITHUB_APP_WEBHOOK_SECRET: string;
-    GITHUB_APP_PRIVATE_KEY: string;
-    GITHUB_APP_ID: string;
-    GITHUB_PERSONAL_ACCESS_TOKEN: string;
-    WORKER_SECRET: string;
-    OCTOMOCK_URL?: string;
-    db: D1Database;
-  };
-}>();
+const app = new Hono<Env>();
 
 async function signRequestBody(secret: string, body: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -61,91 +54,10 @@ app.post(
 
     await next();
   },
-  on('ping', async (_event, c) => {
-    console.log('Ping received');
-    return c.json({ message: 'Pong' }, 200);
-  }),
-  on('push', async ({ repository, ref }, c) => {
-    const repoName = repository.name;
-    const normalizedRef = ref.replace('refs/heads/', '').replace(
-      'refs/tags/',
-      '',
-    );
-    const defaultBranch = repository.default_branch;
-
-    if (repoName !== 'docio') {
-      return c.json({ message: 'Skipping non-docio repo' }, 200);
-    }
-
-    if (normalizedRef !== defaultBranch) {
-      return c.json({ message: 'Skipping non-default branch' }, 200);
-    }
-
-    const personalOctokit = new Octokit({
-      auth: c.env.GITHUB_PERSONAL_ACCESS_TOKEN,
-      baseUrl: c.env.OCTOMOCK_URL || undefined,
-    });
-
-    await personalOctokit.request('POST /repos/{owner}/{repo}/dispatches', {
-      owner: 'docio-dev',
-      repo: 'hosting',
-      event_type: 'build-docs',
-      client_payload: {
-        repo: repository.full_name,
-        ref: normalizedRef,
-        defaultBranch,
-      },
-    });
-
-    return c.json({});
-  }),
-  on('installation.created', async ({ installation, repositories }, c) => {
-    const db = createDbClient(c.env.db);
-
-    const createdInstallation = await db.installation.create({
-      data: {
-        installationId: installation.id,
-      },
-    });
-
-    await db.repository.createMany({
-      data: repositories?.map((repo) => ({
-        installationId: createdInstallation.id,
-        githubId: repo.id,
-        name: repo.name,
-        fullName: repo.full_name,
-        private: repo.private,
-      })) ?? [],
-    });
-  }),
-  // on('installation.deleted', async ({ installation }, c) => {
-  //   const db = createDbClient(c.env.db);
-
-  //   const { id } = (await db.installation.findFirst({
-  //     where: {
-  //       installationId: installation.id,
-  //     },
-  //     select: {
-  //       id: true,
-  //     },
-  //   })) ?? {};
-
-  //   if (!id) {
-  //     return c.json({ message: 'Installation not found' }, 404);
-  //   }
-
-  //   await db.repository.deleteMany({
-  //     where: {
-  //       installationId: id,
-  //     },
-  //   });
-
-  //   await db.installation.delete({
-  //     where: {
-  //       id,
-  //     },
-  //   });
-  // }),
+  pingHandler,
+  pushHandler,
+  installationCreatedHandler,
+  // installationDeletedHandler,
   (c) => c.json({}),
 );
 
