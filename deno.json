@@ -11,7 +11,7 @@
   },
   "imports": {},
   "nodeModulesDir": "auto",
-  "workspace": ["./packages/*", "./apps/*"],
+  "workspace": ["./packages/*", "./apps/*", "./tools"],
   "fmt": {
     "singleQuote": true
   }
