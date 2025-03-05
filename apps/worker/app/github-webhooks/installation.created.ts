@@ -9,16 +9,16 @@ export const installationCreatedHandler = on(
   async ({ installation, repositories }, c: Context<Env>) => {
     const db = createDbClient(c.env.db);
 
-    const createdInstallation = await db.installation.create({
+    await db.installation.create({
       data: {
-        installationId: installation.id,
+        id: installation.id,
       },
     });
 
     await db.repository.createMany({
       data: repositories?.map((repo) => ({
-        installationId: createdInstallation.id,
-        githubId: repo.id,
+        id: repo.id,
+        installationId: installation.id,
         name: repo.name,
         fullName: repo.full_name,
         private: repo.private,

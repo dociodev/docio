@@ -12,7 +12,7 @@
     {
       "binding": "db",
       "database_name": "docio-db",
-      "database_id": "2348446e-5f37-4706-a252-41e1445ace39",
+      "database_id": "e7c6dbfc-4e49-4f01-a551-2053c363f9b1",
       "migrations_dir": "../../packages/db/migrations"
     }
   ],

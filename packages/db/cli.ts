@@ -23,9 +23,9 @@ await new Command()
     new Command()
       .description('Manage migrations')
       .command(
-        'generate',
+        'create',
         new Command()
-          .description('Generate a new migration')
+          .description('Create a new migration')
           .arguments('<name:string>')
           .action(async (_, name) => {
             await $`node ../../node_modules/.bin/wrangler d1 migrations create docio-db ${name}`
@@ -40,13 +40,17 @@ await new Command()
               ) => a.name.localeCompare(b.name),
             );
 
+            const isInitialMigration = migrations.length === 1;
+
             const migration = migrations.at(-1);
 
             if (!migration) {
               throw new Error('No migration found');
             }
 
-            await $`node ../../node_modules/.bin/prisma migrate diff --from-local-d1 --to-schema-datamodel ../../packages/db/prisma/schema.prisma --script --output ../../packages/db/migrations/${migration.name}`
+            await $`node ../../node_modules/.bin/prisma migrate diff ${
+              isInitialMigration ? '--from-empty' : '--from-local-d1'
+            } --to-schema-datamodel ../../packages/db/prisma/schema.prisma --script --output ../../packages/db/migrations/${migration.name}`
               .cwd('../../apps/worker');
           }),
       )

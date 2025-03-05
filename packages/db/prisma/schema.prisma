@@ -9,37 +9,41 @@ datasource db {
 }
 
 model Installation {
-  id             String       @id @default(cuid())
-  installationId Int          @unique
-  repositories   Repository[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id Int @id
+
+  repositories Repository[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Repository {
-  id             String       @id @default(cuid())
-  githubId       Int          @unique
-  installation   Installation @relation(fields: [installationId], references: [id], onDelete: Cascade)
-  installationId String
-  name           String
-  fullName       String
-  private        Boolean
-  defaultBranch  String       @default("main")
-  domains        Domain[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id            Int     @id
+  name          String
+  fullName      String
+  private       Boolean
+  defaultBranch String  @default("main")
 
-  @@unique([installationId, githubId])
+  installation   Installation @relation(fields: [installationId], references: [id], onDelete: Cascade)
+  installationId Int
+
+  domains Domain[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Domain {
-  id           String     @id @default(cuid())
-  name         String // e.g., "example.com"
-  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
-  repositoryId String
-  isVerified   Boolean    @default(false)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id         String  @id
+  name       String  @unique
+  isVerified Boolean @default(false)
 
-  @@unique([repositoryId, name])
+  isDocioDomain Boolean @default(false)
+  dnsRecordId   String? // Cloudflare DNS record ID if isDocioDomain is true
+
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repositoryId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

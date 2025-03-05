@@ -53,14 +53,6 @@ app.post(
 
     await next();
   },
-  async (c) => {
-    const body = await c.req.json();
-    const event = c.req.header('X-GitHub-Event');
-
-    console.log(`${event}`, body?.action ?? 'unknown');
-
-    return c.json({});
-  },
   pingHandler,
   pushHandler,
   installationCreatedHandler,
