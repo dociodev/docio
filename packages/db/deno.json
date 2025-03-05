@@ -13,6 +13,11 @@
   },
   "tasks": {
     "prisma": "prisma",
-    "db": "deno run -A cli.ts"
+    "db": "deno run -A cli.ts",
+    "check:cli": "deno check cli.ts",
+    "check:mod": "deno check mod.ts",
+    "check": {
+      "dependencies": ["check:cli", "check:mod"]
+    }
   }
 }

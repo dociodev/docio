@@ -115,12 +115,12 @@ app.get(
     });
 
     const octokit = await app.getInstallationOctokit(
-      repository.installation.installationId,
+      repository.installation.id,
     );
 
     const { token } = await octokit.auth({
       type: 'installation',
-      installationId: repository.installation.installationId,
+      installationId: repository.installation.id,
     }) as { token: string };
 
     const getTarballResponse = await fetch(

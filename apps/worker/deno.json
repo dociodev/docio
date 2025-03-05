@@ -26,6 +26,7 @@
   },
   "tasks": {
     "wrangler": "node ../../node_modules/.bin/wrangler",
-    "dev": "deno task wrangler dev --port 8786"
+    "dev": "deno task wrangler dev --port 8786",
+    "check": "deno check app/index.ts"
   }
 }

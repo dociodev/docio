@@ -4,7 +4,10 @@
       "dependencies": ["dev:worker", "dev:octomock"]
     },
     "dev:worker": "deno task -r -f @docio/worker dev",
-    "dev:octomock": "deno task -r -f @docio/octomock dev"
+    "dev:octomock": "deno task -r -f @docio/octomock dev",
+    "typecheck": "deno task -r check",
+    "db": "deno task -r -f @docio/db db",
+    "wrangler": "deno task -r -f @docio/worker wrangler"
   },
   "imports": {},
   "nodeModulesDir": "auto",

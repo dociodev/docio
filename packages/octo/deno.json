@@ -8,5 +8,7 @@
     "@octokit/webhooks-types": "npm:@octokit/webhooks-types@^7.6.1",
     "hono": "npm:hono@^4.7.2"
   },
-  "tasks": {}
+  "tasks": {
+    "check": "deno check mod.ts"
+  }
 }
