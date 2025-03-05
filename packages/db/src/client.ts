@@ -6,3 +6,5 @@ export function createDbClient(db: D1Database) {
 
   return new PrismaClient({ adapter });
 }
+
+export { PrismaClient };

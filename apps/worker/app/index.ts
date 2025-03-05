@@ -3,9 +3,9 @@ import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import type { Env } from '@docio/env';
 import { createDbClient } from '@docio/db';
-import { pushHandler } from './github-events/push.ts';
-import { installationCreatedHandler } from './github-events/installation.created.ts';
-import { pingHandler } from './github-events/ping.ts';
+import { pushHandler } from './github/events/push.ts';
+import { installationCreatedHandler } from './github/events/installation.created.ts';
+import { pingHandler } from './github/events/ping.ts';
 import { createOctoApp, createOctokit, getOctokitToken } from '@docio/octo';
 
 const app = new Hono<Env>();
