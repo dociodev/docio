@@ -7,7 +7,6 @@ import { createDbClient } from '@docio/db';
 import { pushHandler } from './github-webhooks/push.ts';
 import { installationCreatedHandler } from './github-webhooks/installation.created.ts';
 import { pingHandler } from './github-webhooks/ping.ts';
-import { installationDeletedHandler } from './github-webhooks/installation.deleted.ts';
 
 const app = new Hono<Env>();
 
@@ -53,6 +52,14 @@ app.post(
     }
 
     await next();
+  },
+  async (c) => {
+    const body = await c.req.json();
+    const event = c.req.header('X-GitHub-Event');
+
+    console.log(`${event}`, body?.action ?? 'unknown');
+
+    return c.json({});
   },
   pingHandler,
   pushHandler,

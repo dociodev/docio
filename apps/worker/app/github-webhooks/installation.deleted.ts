@@ -3,6 +3,7 @@ import { createDbClient } from '@docio/db';
 import type { Env } from '@docio/env';
 import type { Context } from 'hono';
 
+// app is uninstalled
 export const installationDeletedHandler = on(
   'installation.deleted',
   async ({ installation }, c: Context<Env>) => {

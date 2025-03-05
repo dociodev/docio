@@ -3,6 +3,7 @@ import { createDbClient } from '@docio/db';
 import type { Env } from '@docio/env';
 import type { Context } from 'hono';
 
+// app is installed
 export const installationCreatedHandler = on(
   'installation.created',
   async ({ installation, repositories }, c: Context<Env>) => {

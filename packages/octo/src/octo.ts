@@ -39,7 +39,7 @@ export function on<
   listener: (
     event: WebhookEventMap[E] & { action: A },
     c: Context,
-  ) => Promise<void | Response> | Response,
+  ) => Promise<void | Response> | Response | void,
 ) {
   return createMiddleware(async (
     c: Context<{

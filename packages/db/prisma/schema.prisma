@@ -25,8 +25,21 @@ model Repository {
   fullName       String
   private        Boolean
   defaultBranch  String       @default("main")
+  domains        Domain[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
   @@unique([installationId, githubId])
+}
+
+model Domain {
+  id           String     @id @default(cuid())
+  name         String // e.g., "example.com"
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repositoryId String
+  isVerified   Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([repositoryId, name])
 }
