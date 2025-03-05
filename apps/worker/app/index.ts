@@ -1,12 +1,12 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { App } from '@octokit/app';
 import type { Env } from '@docio/env';
 import { createDbClient } from '@docio/db';
 import { pushHandler } from './github-webhooks/push.ts';
 import { installationCreatedHandler } from './github-webhooks/installation.created.ts';
 import { pingHandler } from './github-webhooks/ping.ts';
+import { createOctoApp, createOctokit, getOctokitToken } from '@docio/octo';
 
 const app = new Hono<Env>();
 
@@ -106,22 +106,12 @@ app.get(
       return c.json({ message: 'Not found' }, 404);
     }
 
-    const app = new App({
-      privateKey: c.env.GITHUB_APP_PRIVATE_KEY!,
-      appId: c.env.GITHUB_APP_ID!,
-      webhooks: {
-        secret: c.env.GITHUB_APP_WEBHOOK_SECRET!,
-      },
-    });
-
-    const octokit = await app.getInstallationOctokit(
-      repository.installation.id,
+    const app = createOctoApp(
+      c.env.GITHUB_APP_ID!,
+      c.env.GITHUB_APP_PRIVATE_KEY!,
     );
-
-    const { token } = await octokit.auth({
-      type: 'installation',
-      installationId: repository.installation.id,
-    }) as { token: string };
+    const octokit = await createOctokit(app, repository.installation.id);
+    const token = await getOctokitToken(octokit, repository.installation.id);
 
     const getTarballResponse = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/tarball/${ref}`,

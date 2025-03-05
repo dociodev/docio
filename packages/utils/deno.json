@@ -1,0 +1,14 @@
+{
+  "name": "@docio/utils",
+  "version": "0.0.1",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "imports": {},
+  "tasks": {
+    "check": "deno check mod.ts"
+  },
+  "test": {
+    "include": ["src/**/*.spec.ts"]
+  }
+}

@@ -1,1 +1,2 @@
-export * from './src/octo.ts';
+export * from './src/octokit.ts';
+export * from './src/on.ts';

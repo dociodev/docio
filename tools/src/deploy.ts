@@ -1,5 +1,5 @@
 import { Cloudflare } from 'cloudflare';
-import { slugify } from './utils/slugify.ts';
+import { slugify } from '@docio/utils';
 import { $ } from '@david/dax';
 
 export async function deploy(
