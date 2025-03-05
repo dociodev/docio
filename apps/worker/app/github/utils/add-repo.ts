@@ -23,8 +23,13 @@ export async function addRepo(
 ) {
   const [owner, repo] = repositoryFullName.split('/');
 
-  const docioSubdomain = slugify(
+  const docioDamainPrefix = slugify(
     repo === 'docio' ? owner : repositoryFullName,
+  );
+  const docioSubdomain = await getUniqDomain(
+    docioDamainPrefix,
+    installationId,
+    { db },
   );
 
   const { data: repoData } = await octokit.request(
@@ -54,32 +59,50 @@ export async function addRepo(
 
   const dnsRecord = await cloudflare.dns.records.create({
     zone_id: zoneId,
-    content: `${docioSubdomain}.docio.dev`,
+    content: docioSubdomain,
     name: project.subdomain,
     proxied: true,
     type: 'CNAME',
   });
 
-  const doamin = await cloudflare.pages.projects.domains.create(
+  const domain = await cloudflare.pages.projects.domains.create(
     repoData.id.toString(),
     {
-      name: `${docioSubdomain}.docio.dev`,
+      name: docioSubdomain,
       account_id: accountId,
     },
   );
 
-  if (!doamin) {
+  if (!domain) {
     throw new Error('Failed to create domain');
   }
 
   await db.domain.create({
     data: {
-      id: doamin.id!,
-      name: doamin.name!,
+      id: domain.id!,
+      name: domain.name!,
       isDocioDomain: true,
       dnsRecordId: dnsRecord.id!,
       repositoryId: repoData.id,
       isVerified: true,
     },
   });
+}
+
+async function getUniqDomain(
+  repositorySlug: string,
+  id: number,
+  { db }: { db: PrismaClient },
+) {
+  const docioSubdomain = `${repositorySlug}.docio.dev`;
+
+  const existingDomain = await db.domain.findFirst({
+    where: {
+      name: docioSubdomain,
+    },
+  });
+
+  return existingDomain
+    ? `${existingDomain.name}-${id.toString(16)}.docio.dev`
+    : docioSubdomain;
 }
