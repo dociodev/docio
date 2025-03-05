@@ -5,6 +5,6 @@ import type { Env } from '@docio/env';
 export const pullRequestClosedHandler = on(
   'pull_request.closed',
   async (event, c: Context<Env>) => {
-    console.log(event);
+    // TODO: delete the deployment for the pull request
   },
 );

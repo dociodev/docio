@@ -5,6 +5,6 @@ import type { Env } from '@docio/env';
 export const repositoryPrivatizedHandler = on(
   'repository.privatized',
   async (event, c: Context<Env>) => {
-    console.log(event);
+    // TODO: delete the DNS records and project on cloudflare in 1 hour
   },
 );

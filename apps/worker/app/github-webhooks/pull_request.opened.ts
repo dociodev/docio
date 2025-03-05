@@ -5,6 +5,6 @@ import type { Env } from '@docio/env';
 export const pullRequestOpenedHandler = on(
   'pull_request.opened',
   async (event, c: Context<Env>) => {
-    console.log(event);
+    // TODO: create a new deployment for the pull request
   },
 );
