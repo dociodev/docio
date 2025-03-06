@@ -65,8 +65,8 @@ export async function addRepo(
   console.log(`🌐 Creating DNS record for: ${docioSubdomain}`);
   const dnsRecord = await cloudflare.dns.records.create({
     zone_id: zoneId,
-    content: docioSubdomain,
-    name: project.subdomain,
+    content: project.subdomain,
+    name: docioSubdomain,
     proxied: true,
     type: 'CNAME',
   });
