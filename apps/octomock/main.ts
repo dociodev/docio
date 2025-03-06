@@ -1,7 +1,22 @@
 import { $ } from '@david/dax';
 
 export default {
-  fetch() {
+  async fetch(request: Request) {
+    try {
+      await Deno.mkdir('./tmp');
+    } catch (error) {
+      console.error(error);
+    }
+
+    await Deno.writeTextFile(
+      './tmp/payload.json',
+      JSON.stringify(
+        await request.json(),
+        null,
+        2,
+      ),
+    );
+
     main();
     return Response.json({
       message: 'OK',
@@ -10,27 +25,6 @@ export default {
 };
 
 async function main() {
-  try {
-    await Deno.mkdir('./tmp');
-  } catch (error) {
-    console.error(error);
-  }
-
-  await Deno.writeTextFile(
-    './tmp/payload.json',
-    JSON.stringify(
-      {
-        client_payload: {
-          repo: 'docio-dev/docio',
-          ref: 'main',
-          defaultBranch: 'main',
-        },
-      },
-      null,
-      2,
-    ),
-  );
-
   try {
     await $`act repository_dispatch -s WORKER_SECRET=${Deno.env.get(
       'WORKER_SECRET',
