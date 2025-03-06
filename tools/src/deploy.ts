@@ -3,7 +3,20 @@ import { $ } from '@david/dax';
 export async function deploy(
   repoId: number,
   ref: string,
+  deploymentId: number,
 ) {
+  await fetch(
+    `${
+      Deno.env.get('WORKER_URL')
+    }/api/repository/${repoId}/deployment/${deploymentId}/queued`,
+    {
+      method: 'POST',
+      headers: {
+        'X-Worker-Secret': Deno.env.get('WORKER_SECRET')!,
+      },
+    },
+  );
+
   await Deno.writeTextFile(
     './tmp/untar/wrangler.json',
     JSON.stringify(
@@ -16,5 +29,31 @@ export async function deploy(
     ),
   );
 
-  await $`wrangler pages deploy --branch=${ref}`.cwd('./tmp/untar');
+  try {
+    await $`wrangler pages deploy --branch=${ref}`.cwd('./tmp/untar');
+    await fetch(
+      `${
+        Deno.env.get('WORKER_URL')
+      }/api/repository/${repoId}/deployment/${deploymentId}/success`,
+      {
+        method: 'POST',
+        headers: {
+          'X-Worker-Secret': Deno.env.get('WORKER_SECRET')!,
+        },
+      },
+    );
+  } catch (error) {
+    console.error(error);
+    await fetch(
+      `${
+        Deno.env.get('WORKER_URL')
+      }/api/repository/${repoId}/deployment/${deploymentId}/failure`,
+      {
+        method: 'POST',
+        headers: {
+          'X-Worker-Secret': Deno.env.get('WORKER_SECRET')!,
+        },
+      },
+    );
+  }
 }

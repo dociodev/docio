@@ -6,6 +6,7 @@ import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { removeRepo } from '../github/utils/remove-repo.ts';
 import { createCloudflare } from '@docio/cloudflare';
+import { createOctoApp, createOctokit } from '@docio/octo';
 
 export const repositoryApi = new Hono<Env>();
 
@@ -69,5 +70,75 @@ repositoryApi.delete(
       accountId: c.env.CLOUDFLARE_ACCOUNT_ID,
       qstash,
     });
+  },
+);
+
+repositoryApi.post(
+  '/repository/:id/deployment/:deploymentId/:state',
+  zValidator(
+    'header',
+    z.object({
+      'X-Worker-Secret': z.string(),
+    }),
+  ),
+  async (c, next) => {
+    const { 'X-Worker-Secret': secret } = c.req.valid('header');
+
+    if (secret !== c.env.WORKER_SECRET) {
+      return c.json({ message: 'Invalid secret' }, 401);
+    }
+
+    await next();
+  },
+  zValidator(
+    'param',
+    z.object({
+      id: z.coerce.number(),
+      deploymentId: z.coerce.number(),
+      state: z.enum(['queued', 'success', 'failure']),
+    }),
+  ),
+  async (c) => {
+    const { id, deploymentId, state } = c.req.valid('param');
+
+    const db = createDbClient(c.env.db);
+
+    const repository = await db.repository.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        fullName: true,
+        installation: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    if (!repository) {
+      return c.json({ message: 'Repository not found' }, 404);
+    }
+
+    const [owner, repo] = repository.fullName.split('/');
+
+    const octoApp = createOctoApp(
+      c.env.GITHUB_APP_ID,
+      c.env.GITHUB_APP_PRIVATE_KEY,
+    );
+    const octokit = await createOctokit(octoApp, repository.installation.id);
+
+    await octokit.request(
+      'POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses',
+      {
+        owner,
+        repo,
+        deployment_id: deploymentId,
+        state,
+      },
+    );
+
+    return c.json({ message: 'Deployment state updated' }, 200);
   },
 );

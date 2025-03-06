@@ -43,9 +43,9 @@ await new Command()
       .env('CLOUDFLARE_ZONE_ID=<string>', 'Cloudflare zone ID', {
         required: true,
       })
-      .arguments('<repoId:number> <ref>')
-      .action(async (_, repoId, ref) => {
-        await deploy(repoId, ref);
+      .arguments('<repoId:number> <ref> <deploymentId:number>')
+      .action(async (_, repoId, ref, deploymentId) => {
+        await deploy(repoId, ref, deploymentId);
       }),
   )
   .parse(Deno.args);
