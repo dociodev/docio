@@ -12,10 +12,6 @@
   },
   "tasks": {
     "docio": "deno run --allow-net --allow-write --allow-read --allow-env --allow-run cli.ts",
-    "test": "deno test",
     "check": "deno check cli.ts"
-  },
-  "test": {
-    "include": ["src/**/*.spec.ts"]
   }
 }
