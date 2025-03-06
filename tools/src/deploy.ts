@@ -8,7 +8,7 @@ export async function deploy(
   await fetch(
     `${
       Deno.env.get('WORKER_URL')
-    }/api/repository/${repoId}/deployment/${deploymentId}/queued`,
+    }/api/repository/${repoId}/deployment/${deploymentId}/in_progress`,
     {
       method: 'POST',
       headers: {

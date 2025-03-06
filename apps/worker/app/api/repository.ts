@@ -95,7 +95,7 @@ repositoryApi.post(
     z.object({
       id: z.coerce.number(),
       deploymentId: z.coerce.number(),
-      state: z.enum(['queued', 'success', 'failure']),
+      state: z.enum(['queued', 'in_progress', 'success', 'failure']),
     }),
   ),
   async (c) => {
