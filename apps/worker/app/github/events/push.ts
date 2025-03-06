@@ -89,7 +89,7 @@ export const pushHandler = on(
 
     console.log(`🚀 Triggering build-docs workflow`);
     await personalOctokit.request('POST /repos/{owner}/{repo}/dispatches', {
-      owner: 'docio-dev',
+      owner: 'dociodev',
       repo: 'hosting',
       event_type: 'build-docs',
       client_payload: {
