@@ -109,6 +109,15 @@ repositoryApi.post(
       },
       select: {
         fullName: true,
+        domains: {
+          select: {
+            name: true,
+            isDocioDomain: true,
+          },
+          where: {
+            isVerified: true,
+          },
+        },
         installation: {
           select: {
             id: true,
@@ -129,6 +138,9 @@ repositoryApi.post(
     );
     const octokit = await createOctokit(octoApp, repository.installation.id);
 
+    const docioDomain = repository.domains.find((d) => d.isDocioDomain);
+    const nonDocioDomain = repository.domains.find((d) => !d.isDocioDomain);
+
     await octokit.request(
       'POST /repos/{owner}/{repo}/deployments/{deployment_id}/statuses',
       {
@@ -136,6 +148,11 @@ repositoryApi.post(
         repo,
         deployment_id: deploymentId,
         state,
+        environment_url: nonDocioDomain?.name
+          ? `https://${nonDocioDomain.name}`
+          : docioDomain?.name
+          ? `https://${docioDomain.name}`
+          : undefined,
       },
     );
 
