@@ -17,7 +17,7 @@ jobs:
 
       - uses: denoland/setup-deno@v2
         with:
-          deno-version: v2.x
+          deno-version: v2.2.3
 
       - name: Install dependencies
         run: deno install --allow-scripts
@@ -27,8 +27,8 @@ jobs:
 
       - name: Build and Deploy
         run: |
-          deno task typecheck
           deno task db client generate
+          deno task typecheck
           deno task db migrations up --remote
           deno task wrangler deploy
         env:
