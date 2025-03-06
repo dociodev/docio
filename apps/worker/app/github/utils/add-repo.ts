@@ -21,6 +21,8 @@ export async function addRepo(
     zoneId: string;
   },
 ) {
+  console.log(`📝 Setting up repository: ${repositoryFullName}`);
+
   const [owner, repo] = repositoryFullName.split('/');
 
   const docioDamainPrefix = slugify(
@@ -51,12 +53,16 @@ export async function addRepo(
     },
   });
 
+  console.log(
+    `🔧 Creating Cloudflare Pages project for repo ID: ${repoData.id}`,
+  );
   const project = await cloudflare.pages.projects.create({
     account_id: accountId,
     name: repoData.id.toString(),
     production_branch: repoData.default_branch,
   });
 
+  console.log(`🌐 Creating DNS record for: ${docioSubdomain}`);
   const dnsRecord = await cloudflare.dns.records.create({
     zone_id: zoneId,
     content: docioSubdomain,
@@ -65,6 +71,7 @@ export async function addRepo(
     type: 'CNAME',
   });
 
+  console.log(`🔗 Setting up custom domain: ${docioSubdomain}`);
   const domain = await cloudflare.pages.projects.domains.create(
     repoData.id.toString(),
     {

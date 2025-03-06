@@ -12,6 +12,7 @@ export const repositoryApi = new Hono<Env>();
 repositoryApi.delete(
   '/repository/:id',
   async (c, next) => {
+    console.log(`🔐 Verifying QStash signature for repository deletion`);
     const receiver = new Receiver({
       currentSigningKey: c.env.QSTASH_CURRENT_SIGNING_KEY,
       nextSigningKey: c.env.QSTASH_NEXT_SIGNING_KEY,
@@ -36,6 +37,7 @@ repositoryApi.delete(
   ),
   async (c) => {
     const { id } = c.req.valid('param');
+    console.log(`🗑️ Processing repository deletion request for ID: ${id}`);
 
     const db = createDbClient(c.env.db);
 
@@ -49,6 +51,7 @@ repositoryApi.delete(
     });
 
     if (!repo) {
+      console.log(`⚠️ Repository not found: ${id}`);
       return c.json({ message: 'Repository not found' }, 404);
     }
 
@@ -58,6 +61,7 @@ repositoryApi.delete(
       baseUrl: c.env.QSTASH_URL,
     });
 
+    console.log(`🚮 Removing repository: ${repo.fullName}`);
     await removeRepo(repo.fullName, {
       db,
       cloudflare,

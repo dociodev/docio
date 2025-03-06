@@ -38,7 +38,9 @@ app.post(
     }),
   ),
   async (c, next) => {
-    const { 'X-Hub-Signature-256': signature } = c.req.valid('header');
+    const { 'X-Hub-Signature-256': signature, 'X-GitHub-Event': event } = c.req
+      .valid('header');
+    console.log(`📨 Received GitHub webhook: ${event}`);
 
     const body = await c.req.raw.clone().text();
 
@@ -88,6 +90,7 @@ app.get(
   ),
   async (c) => {
     const { owner, repo, ref } = c.req.valid('param');
+    console.log(`📦 Fetching repository content: ${owner}/${repo}@${ref}`);
 
     const db = createDbClient(c.env.db);
 

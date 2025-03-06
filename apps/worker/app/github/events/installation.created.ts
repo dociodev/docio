@@ -9,6 +9,7 @@ import { addRepo } from '../utils/add-repo.ts';
 export const installationCreatedHandler = on(
   'installation.created',
   async ({ installation, repositories }, c: Context<Env>) => {
+    console.log(`📦 New installation created for ID: ${installation.id}`);
     const db = createDbClient(c.env.db);
 
     await db.installation.create({
@@ -26,6 +27,7 @@ export const installationCreatedHandler = on(
     const cloudflare = createCloudflare(c.env.CLOUDFLARE_API_TOKEN);
 
     for (const repository of repositories ?? []) {
+      console.log(`➕ Adding repository: ${repository.full_name}`);
       await addRepo(repository.full_name, {
         installationId: installation.id,
         octokit,

@@ -6,6 +6,7 @@ import { createDbClient } from '@docio/db';
 export const repositoryPublicizedHandler = on(
   'repository.publicized',
   async (event, c: Context<Env>) => {
+    console.log(`🔓 Repository made public: ${event.repository.full_name}`);
     const db = createDbClient(c.env.db);
 
     await db.repository.update({

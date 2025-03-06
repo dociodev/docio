@@ -6,6 +6,7 @@ import { createDbClient } from '@docio/db';
 export const repositoryRenamedHandler = on(
   'repository.renamed',
   async (event, c: Context<Env>) => {
+    console.log(`📝 Repository renamed: ${event.repository.full_name}`);
     const db = createDbClient(c.env.db);
 
     await db.repository.update({

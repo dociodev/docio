@@ -6,6 +6,9 @@ import { createDbClient } from '@docio/db';
 export const installationTargetRenamedHandler = on(
   'installation_target.renamed',
   async (event, c: Context<Env>) => {
+    console.log(
+      `✏️ Installation target renamed for ID: ${event.installation.id}`,
+    );
     const db = createDbClient(c.env.db);
 
     const repos = await db.repository.findMany({
@@ -15,12 +18,15 @@ export const installationTargetRenamedHandler = on(
     });
 
     for (const repo of repos) {
+      const newFullName = [event.account.login, repo.fullName.split('/')[1]]
+        .join('/');
+      console.log(
+        `📝 Updating repository name from ${repo.fullName} to ${newFullName}`,
+      );
       await db.repository.update({
         where: { id: repo.id },
         data: {
-          fullName: [event.account.login, repo.fullName.split('/')[1]].join(
-            '/',
-          ),
+          fullName: newFullName,
         },
       });
     }

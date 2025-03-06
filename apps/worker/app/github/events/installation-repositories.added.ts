@@ -11,6 +11,9 @@ export const installationRepositoriesAddedHandler = on(
     { repositories_added: repositories, installation },
     c: Context<Env>,
   ) => {
+    console.log(
+      `📦 Adding new repositories for installation ID: ${installation.id}`,
+    );
     const db = createDbClient(c.env.db);
 
     const app = createOctoApp(
@@ -22,6 +25,7 @@ export const installationRepositoriesAddedHandler = on(
     const cloudflare = createCloudflare(c.env.CLOUDFLARE_API_TOKEN);
 
     for (const repository of repositories ?? []) {
+      console.log(`➕ Setting up repository: ${repository.full_name}`);
       await addRepo(repository.full_name, {
         installationId: installation.id,
         octokit,

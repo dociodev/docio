@@ -12,6 +12,7 @@ export const installationRepositoriesRemovedHandler = on(
     { repositories_removed: repositories },
     c: Context<Env>,
   ) => {
+    console.log(`🗑️ Processing repositories removal request`);
     const db = createDbClient(c.env.db);
     const qstash = new Client({
       token: c.env.QSTASH_TOKEN,
@@ -21,6 +22,7 @@ export const installationRepositoriesRemovedHandler = on(
     const cloudflare = createCloudflare(c.env.CLOUDFLARE_API_TOKEN);
 
     for (const repository of repositories ?? []) {
+      console.log(`➖ Removing repository: ${repository.full_name}`);
       await removeRepo(repository.full_name, {
         db,
         cloudflare,

@@ -6,6 +6,8 @@ import type { Env } from '@docio/env';
 export const pushHandler = on(
   'push',
   async ({ repository, ref }, c: Context<Env>) => {
+    console.log(`📥 Push event received for ${repository.full_name}@${ref}`);
+
     const repoName = repository.name;
     const normalizedRef = ref.replace('refs/heads/', '').replace(
       'refs/tags/',
@@ -14,10 +16,12 @@ export const pushHandler = on(
     const defaultBranch = repository.default_branch;
 
     if (repoName !== 'docio') {
+      console.log(`⏭️ Skipping non-docio repo: ${repoName}`);
       return c.json({ message: 'Skipping non-docio repo' }, 200);
     }
 
     if (normalizedRef !== defaultBranch) {
+      console.log(`⏭️ Skipping non-default branch: ${normalizedRef}`);
       return c.json({ message: 'Skipping non-default branch' }, 200);
     }
 
@@ -26,6 +30,7 @@ export const pushHandler = on(
       baseUrl: c.env.OCTOMOCK_URL || undefined,
     });
 
+    console.log(`🚀 Triggering build-docs workflow`);
     await personalOctokit.request('POST /repos/{owner}/{repo}/dispatches', {
       owner: 'docio-dev',
       repo: 'hosting',

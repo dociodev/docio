@@ -18,6 +18,8 @@
   ],
   "alias": {
     "@docio/db": "../../packages/db/mod.ts",
-    "@docio/octo": "../../packages/octo/mod.ts"
+    "@docio/octo": "../../packages/octo/mod.ts",
+    "@docio/utils": "../../packages/utils/mod.ts",
+    "@docio/cloudflare": "../../packages/cloudflare/mod.ts"
   }
 }

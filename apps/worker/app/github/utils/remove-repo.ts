@@ -18,6 +18,10 @@ export async function removeRepo(
     qstash: Client;
   },
 ) {
+  console.log(
+    `🗑️ Starting removal process for repository: ${repositoryFullName}`,
+  );
+
   const repo = await db.repository.findFirst({
     where: {
       fullName: repositoryFullName,
@@ -50,17 +54,19 @@ export async function removeRepo(
     if (!domain.dnsRecordId) {
       continue;
     }
-
+    console.log(`🌐 Removing DNS record: ${domain.dnsRecordId}`);
     await cloudflare.dns.records.delete(domain.dnsRecordId, {
       zone_id: zoneId,
     });
   }
 
+  console.log(`🔧 Removing Cloudflare Pages project for repo ID: ${repo.id}`);
   await cloudflare.pages.projects.delete(repo.id.toString(), {
     account_id: accountId,
   });
 
   if (tasks.length > 0) {
+    console.log(`🧹 Cleaning up ${tasks.length} pending tasks`);
     await qstash.dlq.deleteMany({
       dlqIds: tasks.map((task) => task.id),
     });

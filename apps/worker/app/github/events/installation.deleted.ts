@@ -10,6 +10,7 @@ import { Client } from '@upstash/qstash';
 export const installationDeletedHandler = on(
   'installation.deleted',
   async ({ installation }, c: Context<Env>) => {
+    console.log(`🗑️ Installation deleted for ID: ${installation.id}`);
     const db = createDbClient(c.env.db);
     const qstash = new Client({
       token: c.env.QSTASH_TOKEN,
@@ -32,6 +33,7 @@ export const installationDeletedHandler = on(
     const cloudflare = createCloudflare(c.env.CLOUDFLARE_API_TOKEN);
 
     for (const repository of repositories ?? []) {
+      console.log(`➖ Removing repository: ${repository.fullName}`);
       await removeRepo(repository.fullName, {
         db,
         cloudflare,
