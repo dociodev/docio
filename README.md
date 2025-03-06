@@ -7,9 +7,19 @@ need a simple and reliable way to host their documentation.
 ## 🌟 Features
 
 - Automatic building and deployment of Rspress documentation sites
-- Custom domain for each organization (`https://[organization-name].docio.dev`)
+- Domain for each organization (`https://[organization-name].docio.dev`)
 - GitHub integration for seamless deployment
 - Zero-configuration setup
+
+## Current Development Status
+
+- [x] Basic deployment pipeline
+- [x] GitHub App integration
+- [x] Automatic builds on push
+- [ ] Documentation site preview for PRs
+- [ ] Custom domains support
+- [ ] Support not only repo with the `docio` name
+- [ ] Plugins support
 
 ## 🏗 Project Structure
 
