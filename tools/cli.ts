@@ -43,6 +43,12 @@ await new Command()
       .env('CLOUDFLARE_ZONE_ID=<string>', 'Cloudflare zone ID', {
         required: true,
       })
+      .env('WORKER_SECRET=<string>', 'Worker secret', {
+        required: true,
+      })
+      .env('WORKER_URL=<string>', 'Worker URL', {
+        required: true,
+      })
       .arguments('<repoId:number> <ref> <deploymentId:number>')
       .action(async (_, repoId, ref, deploymentId) => {
         await deploy(repoId, ref, deploymentId);
