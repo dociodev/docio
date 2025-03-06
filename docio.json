@@ -1,0 +1,20 @@
+{
+  "root": "apps/docs",
+  "outDir": "apps/docs/dist",
+  "title": "docio.dev",
+  "icon": "/rspress-icon.png",
+  "logoText": "docio.dev",
+  "themeConfig": {
+    "lastUpdated": true,
+    "socialLinks": [
+      {
+        "icon": "github",
+        "mode": "link",
+        "content": "https://github.com/dociodev/docio"
+      }
+    ],
+    "footer": {
+      "message": "© 2025 docio.dev"
+    }
+  }
+}

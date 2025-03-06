@@ -7,7 +7,8 @@
     "dev:octomock": "deno task -r -f @docio/octomock dev",
     "typecheck": "deno task -r check",
     "db": "deno task -r -f @docio/db db",
-    "wrangler": "deno task -r -f @docio/worker wrangler"
+    "wrangler": "deno task -r -f @docio/worker wrangler",
+    "rspress": "node node_modules/.bin/rspress -c docio.json"
   },
   "imports": {},
   "nodeModulesDir": "auto",

@@ -1,5 +1,6 @@
 import { UntarStream } from '@std/tar/untar-stream';
 import { dirname, join, normalize } from '@std/path';
+import { exists } from '@std/fs/exists';
 
 export async function download(
   fullName: string,
@@ -52,5 +53,12 @@ export async function download(
     const path = join(Deno.cwd(), 'tmp/untar', normalizedPath);
     await Deno.mkdir(dirname(path), { recursive: true });
     await entry.readable?.pipeTo((await Deno.create(path)).writable);
+  }
+
+  if (await exists('./tmp/untar/docio.json')) {
+    console.log('docio.json found');
+  } else {
+    console.error('docio.json not found');
+    Deno.exit(1);
   }
 }

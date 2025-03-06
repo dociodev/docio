@@ -60,6 +60,27 @@ export async function removeRepo(
     });
   }
 
+  const cloudflareDomainsResponse = await cloudflare.pages.projects.domains
+    .list(
+      repo.id.toString(),
+      {
+        account_id: accountId,
+      },
+    );
+
+  for await (const domainPage of cloudflareDomainsResponse.iterPages()) {
+    for (const domain of domainPage.result) {
+      console.log(`🌐 Removing domain: ${domain.name}`);
+      await cloudflare.pages.projects.domains.delete(
+        repo.id.toString(),
+        domain.id!,
+        {
+          account_id: accountId,
+        },
+      );
+    }
+  }
+
   console.log(`🔧 Removing Cloudflare Pages project for repo ID: ${repo.id}`);
   await cloudflare.pages.projects.delete(repo.id.toString(), {
     account_id: accountId,

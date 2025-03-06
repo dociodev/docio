@@ -1,5 +1,5 @@
 import { $ } from '@david/dax';
 
 export async function build() {
-  await $`rspress build`.cwd('./tmp/untar');
+  await $`rspress build -c docio.json`.cwd('./tmp/untar');
 }
