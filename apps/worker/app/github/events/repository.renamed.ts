@@ -18,7 +18,5 @@ export const repositoryRenamedHandler = on(
         fullName: event.repository.full_name,
       },
     });
-
-    // TODO: update the DNS records on cloudflare
   },
 );

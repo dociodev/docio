@@ -2,7 +2,6 @@ import type {
   WebhookEventMap,
   WebhookEventName,
 } from '@octokit/webhooks-types';
-import { createMiddleware } from 'hono/factory';
 import type { Context } from 'hono';
 
 export type EventAction<T extends WebhookEventName> = 'action' extends
@@ -41,14 +40,7 @@ export function on<
     c: Context,
   ) => Promise<void | Response> | Response | void,
 ) {
-  return createMiddleware(async (
-    c: Context<{
-      Variables: {
-        payload: WebhookEventMap[E] & { action: A };
-      };
-    }>,
-    next,
-  ) => {
+  return async (c: Context) => {
     if (!c.get('payload')) {
       c.set('payload', await c.req.json());
     }
@@ -58,17 +50,17 @@ export function on<
 
     const [eventName, actionName] = event.split('.');
 
+    console.log(
+      `📥 Checking if ${requestEventName} matches ${eventName}${
+        actionName ? `.${actionName}` : ''
+      }`,
+    );
+
     if (
       requestEventName === eventName &&
       (!actionName || actionName === payload.action)
     ) {
-      const result = await listener(payload, c);
-
-      if (result instanceof Response) {
-        return result;
-      }
+      return listener(payload, c);
     }
-
-    await next();
-  });
+  };
 }
