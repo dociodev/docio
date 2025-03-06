@@ -17,12 +17,16 @@ export async function deploy(
     },
   );
 
+  const docioJson = await Deno.readTextFile('./tmp/untar/docio.json');
+  const docioConfig = JSON.parse(docioJson);
+  const outDir = docioConfig.outDir ?? './doc_build';
+
   await Deno.writeTextFile(
     './tmp/untar/wrangler.json',
     JSON.stringify(
       {
         name: repoId.toString(),
-        pages_build_output_dir: './doc_build',
+        pages_build_output_dir: outDir,
       },
       null,
       2,
