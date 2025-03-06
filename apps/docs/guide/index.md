@@ -74,5 +74,5 @@ Remember to commit and push your changes to the default branch (usually `main` o
 
 If you encounter any issues or need assistance:
 - Check the [Rspress documentation](https://rspress.dev/)
-- Open an issue in the [docio.dev repository](https://github.com/docio-dev/docio)
+- Open an issue in the [docio.dev repository](https://github.com/dociodev/docio)
 - Contact support through GitHub discussions
