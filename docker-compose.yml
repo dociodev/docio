@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+  qstash:
+    image: public.ecr.aws/upstash/qstash:latest
+    ports:
+      - "8081:8080"

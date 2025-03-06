@@ -4,6 +4,7 @@ import type { Env } from '@docio/env';
 import { createDbClient } from '@docio/db';
 import { createCloudflare } from '@docio/cloudflare';
 import { removeRepo } from '../utils/remove-repo.ts';
+import { Client } from '@upstash/qstash';
 
 export const installationRepositoriesRemovedHandler = on(
   'installation_repositories.removed',
@@ -12,6 +13,10 @@ export const installationRepositoriesRemovedHandler = on(
     c: Context<Env>,
   ) => {
     const db = createDbClient(c.env.db);
+    const qstash = new Client({
+      token: c.env.QSTASH_TOKEN,
+      baseUrl: c.env.QSTASH_URL,
+    });
 
     const cloudflare = createCloudflare(c.env.CLOUDFLARE_API_TOKEN);
 
@@ -21,6 +26,7 @@ export const installationRepositoriesRemovedHandler = on(
         cloudflare,
         zoneId: c.env.CLOUDFLARE_ZONE_ID,
         accountId: c.env.CLOUDFLARE_ACCOUNT_ID,
+        qstash,
       });
     }
   },

@@ -7,6 +7,7 @@ import { pushHandler } from './github/events/push.ts';
 import { installationCreatedHandler } from './github/events/installation.created.ts';
 import { pingHandler } from './github/events/ping.ts';
 import { createOctoApp, createOctokit, getOctokitToken } from '@docio/octo';
+import { repositoryApi } from './api/repository.ts';
 
 const app = new Hono<Env>();
 
@@ -144,5 +145,7 @@ app.get(
     return fetch(downloadUrl);
   },
 );
+
+app.route('/api', repositoryApi);
 
 export default app;

@@ -9,10 +9,16 @@ export interface Env {
 
     WORKER_SECRET: string;
     OCTOMOCK_URL?: string;
+    WORKER_URL: string;
 
     CLOUDFLARE_API_TOKEN: string;
     CLOUDFLARE_ACCOUNT_ID: string;
     CLOUDFLARE_ZONE_ID: string;
+
+    QSTASH_URL: string;
+    QSTASH_TOKEN: string;
+    QSTASH_CURRENT_SIGNING_KEY: string;
+    QSTASH_NEXT_SIGNING_KEY: string;
 
     db: D1Database;
   };

@@ -1,5 +1,6 @@
 import type { PrismaClient } from '@docio/db';
 import type { Cloudflare } from 'cloudflare';
+import type { Client } from '@upstash/qstash';
 
 export async function removeRepo(
   repositoryFullName: string,
@@ -8,11 +9,13 @@ export async function removeRepo(
     cloudflare,
     zoneId,
     accountId,
+    qstash,
   }: {
     db: PrismaClient;
     cloudflare: Cloudflare;
     zoneId: string;
     accountId: string;
+    qstash: Client;
   },
 ) {
   const repo = await db.repository.findFirst({
@@ -26,6 +29,14 @@ export async function removeRepo(
           isDocioDomain: true,
         },
       },
+      tasks: {
+        select: {
+          id: true,
+        },
+        where: {
+          status: 'PENDING',
+        },
+      },
     },
   });
 
@@ -33,7 +44,7 @@ export async function removeRepo(
     return false;
   }
 
-  const { domains } = repo;
+  const { domains, tasks } = repo;
 
   for (const domain of domains) {
     if (!domain.dnsRecordId) {
@@ -48,6 +59,12 @@ export async function removeRepo(
   await cloudflare.pages.projects.delete(repo.id.toString(), {
     account_id: accountId,
   });
+
+  if (tasks.length > 0) {
+    await qstash.dlq.deleteMany({
+      dlqIds: tasks.map((task) => task.id),
+    });
+  }
 
   await db.repository.delete({
     where: {

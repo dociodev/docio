@@ -4,12 +4,17 @@ import type { Env } from '@docio/env';
 import type { Context } from 'hono';
 import { createCloudflare } from '@docio/cloudflare';
 import { removeRepo } from '../utils/remove-repo.ts';
+import { Client } from '@upstash/qstash';
 
 // app is uninstalled
 export const installationDeletedHandler = on(
   'installation.deleted',
   async ({ installation }, c: Context<Env>) => {
     const db = createDbClient(c.env.db);
+    const qstash = new Client({
+      token: c.env.QSTASH_TOKEN,
+      baseUrl: c.env.QSTASH_URL,
+    });
 
     const { repositories } = (await db.installation.findFirst({
       where: {
@@ -32,6 +37,7 @@ export const installationDeletedHandler = on(
         cloudflare,
         zoneId: c.env.CLOUDFLARE_ZONE_ID,
         accountId: c.env.CLOUDFLARE_ACCOUNT_ID,
+        qstash,
       });
     }
 

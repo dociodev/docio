@@ -28,6 +28,7 @@ model Repository {
   installationId Int
 
   domains Domain[]
+  tasks   Task[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -40,6 +41,18 @@ model Domain {
 
   isDocioDomain Boolean @default(false)
   dnsRecordId   String? // Cloudflare DNS record ID if isDocioDomain is true
+
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repositoryId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Task {
+  id     String @id
+  name   String
+  status String
 
   repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   repositoryId Int
