@@ -31,9 +31,9 @@ export const pushHandler = on(
       repo: 'hosting',
       event_type: 'build-docs',
       client_payload: {
-        repo: repository.full_name,
+        id: repository.id,
+        fullName: repository.full_name,
         ref: normalizedRef,
-        defaultBranch,
       },
     });
 

@@ -25,9 +25,9 @@ await new Command()
       .env('WORKER_URL=<string>', 'Worker URL', {
         required: true,
       })
-      .arguments('<repo> <ref>')
-      .action(async (_, repo, ref) => {
-        await download(repo, ref);
+      .arguments('<fullName> <ref>')
+      .action(async (_, fullName, ref) => {
+        await download(fullName, ref);
       }),
   )
   .command(
@@ -43,9 +43,9 @@ await new Command()
       .env('CLOUDFLARE_ZONE_ID=<string>', 'Cloudflare zone ID', {
         required: true,
       })
-      .arguments('<repo> <ref> <defaultBranch>')
-      .action(async (_, repo, ref, defaultBranch) => {
-        await deploy(repo, ref, defaultBranch);
+      .arguments('<repoId:number> <ref>')
+      .action(async (_, repoId, ref) => {
+        await deploy(repoId, ref);
       }),
   )
   .parse(Deno.args);

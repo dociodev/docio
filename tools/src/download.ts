@@ -2,11 +2,11 @@ import { UntarStream } from '@std/tar/untar-stream';
 import { dirname, join, normalize } from '@std/path';
 
 export async function download(
-  repo: string,
+  fullName: string,
   ref: string,
 ) {
   const response = await fetch(
-    `${Deno.env.get('WORKER_URL')}/api/github/${repo}/${ref}`,
+    `${Deno.env.get('WORKER_URL')}/api/github/${fullName}/${ref}`,
     {
       headers: {
         'X-Worker-Secret': Deno.env.get('WORKER_SECRET')!,
