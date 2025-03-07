@@ -16,7 +16,7 @@ export const pushHandler = on(
     );
     const defaultBranch = repository.default_branch;
 
-    if (repoName !== 'docio') {
+    if (repoName !== 'docio' && repository.full_name !== 'dociodev/local') {
       console.log(`⏭️ Skipping non-docio repo: ${repoName}`);
       return c.json({ message: 'Skipping non-docio repo' }, 200);
     }
