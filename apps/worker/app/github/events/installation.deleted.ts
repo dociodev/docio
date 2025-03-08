@@ -2,9 +2,7 @@ import { on } from '@docio/octo';
 import { createDbClient, eq, Installation } from '@docio/db';
 import type { HonoEnv } from '@docio/env';
 import type { Context } from 'hono';
-import { createCloudflare } from '@docio/cloudflare';
 import { removeRepo } from '../utils/remove-repo.ts';
-import { Client } from '@upstash/qstash';
 
 // app is uninstalled
 export const installationDeletedHandler = on(
@@ -12,10 +10,6 @@ export const installationDeletedHandler = on(
   async ({ installation }, _c: Context<HonoEnv>) => {
     console.log(`🗑️ Installation deleted for ID: ${installation.id}`);
     const db = createDbClient();
-    const qstash = new Client({
-      token: Deno.env.get('QSTASH_TOKEN')!,
-      baseUrl: Deno.env.get('QSTASH_URL')!,
-    });
 
     const { repositories } = (await db.query.Installation.findFirst({
       where: eq(Installation.id, installation.id),
@@ -28,17 +22,9 @@ export const installationDeletedHandler = on(
       },
     })) ?? { repositories: [] };
 
-    const cloudflare = createCloudflare(Deno.env.get('CLOUDFLARE_API_TOKEN')!);
-
     for (const repository of repositories ?? []) {
       console.log(`➖ Removing repository: ${repository.fullName}`);
-      await removeRepo(repository.fullName, {
-        db,
-        cloudflare,
-        zoneId: Deno.env.get('CLOUDFLARE_ZONE_ID')!,
-        accountId: Deno.env.get('CLOUDFLARE_ACCOUNT_ID')!,
-        qstash,
-      });
+      await removeRepo(repository.fullName);
     }
 
     await db.delete(Installation).where(eq(Installation.id, installation.id));

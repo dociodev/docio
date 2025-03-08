@@ -1,9 +1,9 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import type { HonoEnv } from '@docio/env';
+import { env, type HonoEnv } from '@docio/env';
 import { createDbClient, eq, Repository } from '@docio/db';
-import { createOctoApp, createOctokit, getOctokitToken } from '@docio/octo';
+import { createOctokit, getOctokitToken } from '@docio/octo';
 import { repositoryApi } from './api/repository.ts';
 import { eventMiddleware } from './github/events/index.ts';
 
@@ -48,7 +48,7 @@ app.post(
 
     if (
       await signRequestBody(
-        Deno.env.get('GITHUB_APP_WEBHOOK_SECRET')!,
+        env.GITHUB_APP_WEBHOOK_SECRET,
         body,
       ) !== signature
     ) {
@@ -72,7 +72,7 @@ app.get(
   async (c, next) => {
     const { 'X-Worker-Secret': secret } = c.req.valid('header');
 
-    if (secret !== Deno.env.get('WORKER_SECRET')!) {
+    if (secret !== env.WORKER_SECRET) {
       return c.json({ message: 'Invalid secret' }, 401);
     }
 
@@ -110,11 +110,7 @@ app.get(
       return c.json({ message: 'Not found' }, 404);
     }
 
-    const app = createOctoApp(
-      Deno.env.get('GITHUB_APP_ID')!,
-      Deno.env.get('GITHUB_APP_PRIVATE_KEY')!,
-    );
-    const octokit = await createOctokit(app, repository.installation.id);
+    const octokit = await createOctokit(repository.installation.id);
     const token = await getOctokitToken(octokit, repository.installation.id);
 
     const getTarballResponse = await fetch(

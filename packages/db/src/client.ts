@@ -1,8 +1,9 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import * as schema from './schema.ts';
+import { env } from '@docio/env';
 
 export function createDbClient() {
-  return drizzle(Deno.env.get('DATABASE_URL')!, {
+  return drizzle(env.DATABASE_URL, {
     schema,
   });
 }

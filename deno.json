@@ -10,7 +10,9 @@
     "wrangler": "deno task -r -f @docio/worker wrangler",
     "rspress": "node node_modules/.bin/rspress -c docio.json"
   },
-  "imports": {},
+  "imports": {
+    "zod": "npm:zod@^3.24.2"
+  },
   "nodeModulesDir": "auto",
   "workspace": ["./packages/*", "./apps/*", "./tools"],
   "fmt": {

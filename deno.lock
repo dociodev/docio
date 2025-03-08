@@ -3699,6 +3699,9 @@
     }
   },
   "workspace": {
+    "dependencies": [
+      "npm:zod@^3.24.2"
+    ],
     "members": {
       "apps/octomock": {
         "dependencies": [

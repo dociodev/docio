@@ -1,7 +1,7 @@
-import { createOctoApp, createOctokit, on } from '@docio/octo';
+import { createOctokit, on } from '@docio/octo';
 import { Octokit } from '@octokit/core';
 import type { Context } from 'hono';
-import type { HonoEnv } from '@docio/env';
+import { env, type HonoEnv } from '@docio/env';
 import { createDbClient, eq, Repository } from '@docio/db';
 
 export const pushHandler = on(
@@ -46,11 +46,7 @@ export const pushHandler = on(
 
     const [owner, repo] = repository.full_name.split('/');
 
-    const octoApp = createOctoApp(
-      Deno.env.get('GITHUB_APP_ID')!,
-      Deno.env.get('GITHUB_APP_PRIVATE_KEY')!,
-    );
-    const octokit = await createOctokit(octoApp, installation.id);
+    const octokit = await createOctokit(installation.id);
 
     const deployment = await octokit.request(
       'POST /repos/{owner}/{repo}/deployments',
@@ -81,8 +77,8 @@ export const pushHandler = on(
     );
 
     const personalOctokit = new Octokit({
-      auth: Deno.env.get('GITHUB_PERSONAL_ACCESS_TOKEN')!,
-      baseUrl: Deno.env.get('OCTOMOCK_URL') || undefined,
+      auth: env.GITHUB_PERSONAL_ACCESS_TOKEN,
+      baseUrl: env.OCTOMOCK_URL || undefined,
     });
 
     console.log(`🚀 Triggering build-docs workflow`);

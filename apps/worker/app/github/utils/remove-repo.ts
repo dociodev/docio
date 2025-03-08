@@ -1,23 +1,13 @@
-import { type DbClient, eq, Repository, Task } from '@docio/db';
-import type { Cloudflare } from 'cloudflare';
-import type { Client } from '@upstash/qstash';
+import { createDbClient, eq, Repository, Task } from '@docio/db';
+import { env } from '@docio/env';
+import { createCloudflare } from '@docio/cloudflare';
 
 export async function removeRepo(
   repositoryFullName: string,
-  {
-    db,
-    cloudflare,
-    zoneId,
-    accountId,
-    qstash,
-  }: {
-    db: DbClient;
-    cloudflare: Cloudflare;
-    zoneId: string;
-    accountId: string;
-    qstash: Client;
-  },
 ) {
+  const cloudflare = createCloudflare();
+  const db = createDbClient();
+
   console.log(
     `🗑️ Starting removal process for repository: ${repositoryFullName}`,
   );
@@ -55,7 +45,7 @@ export async function removeRepo(
     }
     console.log(`🌐 Removing DNS record: ${domain.dnsRecordId}`);
     await cloudflare.dns.records.delete(domain.dnsRecordId, {
-      zone_id: zoneId,
+      zone_id: env.CLOUDFLARE_ZONE_ID,
     });
   }
 
@@ -63,7 +53,7 @@ export async function removeRepo(
     .list(
       repo.id.toString(),
       {
-        account_id: accountId,
+        account_id: env.CLOUDFLARE_ACCOUNT_ID,
       },
     );
 
@@ -74,7 +64,7 @@ export async function removeRepo(
         repo.id.toString(),
         domain.id!,
         {
-          account_id: accountId,
+          account_id: env.CLOUDFLARE_ACCOUNT_ID,
         },
       );
     }
@@ -82,15 +72,8 @@ export async function removeRepo(
 
   console.log(`🔧 Removing Cloudflare Pages project for repo ID: ${repo.id}`);
   await cloudflare.pages.projects.delete(repo.id.toString(), {
-    account_id: accountId,
+    account_id: env.CLOUDFLARE_ACCOUNT_ID,
   });
-
-  if (tasks.length > 0) {
-    console.log(`🧹 Cleaning up ${tasks.length} pending tasks`);
-    await qstash.dlq.deleteMany({
-      dlqIds: tasks.map((task) => task.id),
-    });
-  }
 
   await db.delete(Repository).where(eq(Repository.id, repo.id));
 }

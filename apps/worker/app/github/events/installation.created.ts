@@ -1,4 +1,4 @@
-import { createOctoApp, createOctokit, on } from '@docio/octo';
+import { createOctokit, on } from '@docio/octo';
 import { createDbClient, Installation } from '@docio/db';
 import type { HonoEnv } from '@docio/env';
 import type { Context } from 'hono';
@@ -17,23 +17,10 @@ export const installationCreatedHandler = on(
       updatedAt: new Date(),
     });
 
-    const app = createOctoApp(
-      Deno.env.get('GITHUB_APP_ID')!,
-      Deno.env.get('GITHUB_APP_PRIVATE_KEY')!,
-    );
-    const octokit = await createOctokit(app, installation.id);
-
-    const cloudflare = createCloudflare(Deno.env.get('CLOUDFLARE_API_TOKEN')!);
-
     for (const repository of repositories ?? []) {
       console.log(`➕ Adding repository: ${repository.full_name}`);
       await addRepo(repository.full_name, {
         installationId: installation.id,
-        octokit,
-        db,
-        cloudflare,
-        accountId: Deno.env.get('CLOUDFLARE_ACCOUNT_ID')!,
-        zoneId: Deno.env.get('CLOUDFLARE_ZONE_ID')!,
       });
     }
   },
