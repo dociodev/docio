@@ -1,17 +1,16 @@
 import { UntarStream } from '@std/tar/untar-stream';
 import { dirname, join, normalize } from '@std/path';
 import { exists } from '@std/fs/exists';
-import { env } from '@docio/env';
 
 export async function download(
   fullName: string,
   ref: string,
 ) {
   const response = await fetch(
-    `${env.WORKER_URL}/api/github/${fullName}/${ref}`,
+    `${Deno.env.get('WORKER_URL')}/api/github/${fullName}/${ref}`,
     {
       headers: {
-        'X-Worker-Secret': env.WORKER_SECRET,
+        'X-Worker-Secret': Deno.env.get('WORKER_SECRET') ?? '',
       },
     },
   );
