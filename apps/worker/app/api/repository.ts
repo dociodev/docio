@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import type { Env } from '@docio/env';
+import type { HonoEnv } from '@docio/env';
 import { Client, Receiver } from '@upstash/qstash';
 import { createDbClient, Domain, eq, Repository } from '@docio/db';
 import { zValidator } from '@hono/zod-validator';
@@ -8,7 +8,7 @@ import { removeRepo } from '../github/utils/remove-repo.ts';
 import { createCloudflare } from '@docio/cloudflare';
 import { createOctoApp, createOctokit } from '@docio/octo';
 
-export const repositoryApi = new Hono<Env>();
+export const repositoryApi = new Hono<HonoEnv>();
 
 repositoryApi.delete(
   '/repository/:id',

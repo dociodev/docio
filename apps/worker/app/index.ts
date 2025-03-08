@@ -1,13 +1,13 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import type { Env } from '@docio/env';
+import type { HonoEnv } from '@docio/env';
 import { createDbClient, eq, Repository } from '@docio/db';
 import { createOctoApp, createOctokit, getOctokitToken } from '@docio/octo';
 import { repositoryApi } from './api/repository.ts';
 import { eventMiddleware } from './github/events/index.ts';
 
-const app = new Hono<Env>();
+const app = new Hono<HonoEnv>();
 
 async function signRequestBody(secret: string, body: string): Promise<string> {
   const encoder = new TextEncoder();

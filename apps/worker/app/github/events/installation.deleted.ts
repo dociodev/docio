@@ -1,6 +1,6 @@
 import { on } from '@docio/octo';
 import { createDbClient, eq, Installation } from '@docio/db';
-import type { Env } from '@docio/env';
+import type { HonoEnv } from '@docio/env';
 import type { Context } from 'hono';
 import { createCloudflare } from '@docio/cloudflare';
 import { removeRepo } from '../utils/remove-repo.ts';
@@ -9,7 +9,7 @@ import { Client } from '@upstash/qstash';
 // app is uninstalled
 export const installationDeletedHandler = on(
   'installation.deleted',
-  async ({ installation }, _c: Context<Env>) => {
+  async ({ installation }, _c: Context<HonoEnv>) => {
     console.log(`🗑️ Installation deleted for ID: ${installation.id}`);
     const db = createDbClient();
     const qstash = new Client({

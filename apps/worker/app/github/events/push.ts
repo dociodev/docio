@@ -1,12 +1,12 @@
 import { createOctoApp, createOctokit, on } from '@docio/octo';
 import { Octokit } from '@octokit/core';
 import type { Context } from 'hono';
-import type { Env } from '@docio/env';
+import type { HonoEnv } from '@docio/env';
 import { createDbClient, eq, Repository } from '@docio/db';
 
 export const pushHandler = on(
   'push',
-  async ({ repository, ref }, c: Context<Env>) => {
+  async ({ repository, ref }, c: Context<HonoEnv>) => {
     console.log(`📥 Push event received for ${repository.full_name}@${ref}`);
 
     const repoName = repository.name;

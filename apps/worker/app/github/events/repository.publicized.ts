@@ -1,11 +1,11 @@
 import { on } from '@docio/octo';
 import type { Context } from 'hono';
-import type { Env } from '@docio/env';
+import type { HonoEnv } from '@docio/env';
 import { createDbClient, eq, Repository } from '@docio/db';
 
 export const repositoryPublicizedHandler = on(
   'repository.publicized',
-  async (event, _c: Context<Env>) => {
+  async (event, _c: Context<HonoEnv>) => {
     console.log(`🔓 Repository made public: ${event.repository.full_name}`);
     const db = createDbClient();
 

@@ -1,6 +1,6 @@
 import { createOctoApp, createOctokit, on } from '@docio/octo';
 import type { Context } from 'hono';
-import type { Env } from '@docio/env';
+import type { HonoEnv } from '@docio/env';
 import { createDbClient } from '@docio/db';
 import { addRepo } from '../utils/add-repo.ts';
 import { createCloudflare } from '@docio/cloudflare';
@@ -9,7 +9,7 @@ export const installationRepositoriesAddedHandler = on(
   'installation_repositories.added',
   async (
     { repositories_added: repositories, installation },
-    c: Context<Env>,
+    c: Context<HonoEnv>,
   ) => {
     console.log(
       `📦 Adding new repositories for installation ID: ${installation.id}`,

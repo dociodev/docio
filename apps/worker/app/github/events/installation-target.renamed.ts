@@ -1,11 +1,11 @@
 import { on } from '@docio/octo';
 import type { Context } from 'hono';
-import type { Env } from '@docio/env';
+import type { HonoEnv } from '@docio/env';
 import { createDbClient, eq, Repository } from '@docio/db';
 
 export const installationTargetRenamedHandler = on(
   'installation_target.renamed',
-  async (event, _c: Context<Env>) => {
+  async (event, _c: Context<HonoEnv>) => {
     console.log(
       `✏️ Installation target renamed for ID: ${event.installation.id}`,
     );
