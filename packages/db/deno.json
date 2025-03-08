@@ -4,16 +4,7 @@
   "exports": {
     ".": "./mod.ts"
   },
-  "imports": {
-    "@cliffy/command": "jsr:@cliffy/command@^1.0.0-rc.7",
-    "@david/dax": "jsr:@david/dax@^0.42.0",
-    "@prisma/adapter-d1": "npm:@prisma/adapter-d1@^6.4.1",
-    "@prisma/client": "npm:@prisma/client@^6.4.1",
-    "drizzle-orm": "npm:drizzle-orm@^0.40.0",
-    "drizzle-prisma-generator": "npm:drizzle-prisma-generator@^0.1.7",
-    "postgres": "npm:postgres@^3.4.5",
-    "prisma": "npm:prisma@^6.4.1"
-  },
+  "imports": {},
   "tasks": {
     "prisma": "prisma",
     "db": "deno run -A cli.ts",

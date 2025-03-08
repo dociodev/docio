@@ -4,12 +4,7 @@
   "exports": {
     ".": "./mod.ts"
   },
-  "imports": {
-    "@octokit/app": "npm:@octokit/app@^15.1.5",
-    "@octokit/core": "npm:@octokit/core@^6.1.4",
-    "@octokit/webhooks-types": "npm:@octokit/webhooks-types@^7.6.1",
-    "hono": "npm:hono@^4.7.2"
-  },
+  "imports": {},
   "tasks": {
     "check": "deno check mod.ts"
   }

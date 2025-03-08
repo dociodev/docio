@@ -4,8 +4,8 @@ import { z } from 'zod';
 import { env, type HonoEnv } from '@docio/env';
 import { createDbClient, eq, Repository } from '@docio/db';
 import { createOctokit, getOctokitToken } from '@docio/octo';
-import { repositoryApi } from './api/repository.ts';
-import { eventMiddleware } from './github/events/index.ts';
+import { repositoryApi } from './src/api/repository.ts';
+import { eventMiddleware } from './src/github/events/index.ts';
 
 const app = new Hono<HonoEnv>();
 

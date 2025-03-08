@@ -4,9 +4,7 @@
   "exports": {
     ".": "./mod.ts"
   },
-  "imports": {
-    "cloudflare": "npm:cloudflare@^4.1.0"
-  },
+  "imports": {},
   "tasks": {
     "check": "deno check mod.ts"
   }
