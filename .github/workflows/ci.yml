@@ -1,6 +1,9 @@
 name: Deploy Worker
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
@@ -18,9 +21,6 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.2.3
-
-      - name: Install dependencies
-        run: deno install --allow-scripts
 
       - name: Test
         run: deno task -r test

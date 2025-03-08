@@ -4,6 +4,6 @@ WORKDIR /app
 
 ADD . /app
 
-RUN deno install --entrypoint apps/worker/main.ts
+RUN deno install --allow-scripts --entrypoint apps/worker/main.ts
 
 CMD ["task", "-r", "-f", "worker", "start"]
