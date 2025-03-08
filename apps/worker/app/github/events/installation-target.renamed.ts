@@ -1,20 +1,18 @@
 import { on } from '@docio/octo';
 import type { Context } from 'hono';
 import type { Env } from '@docio/env';
-import { createDbClient } from '@docio/db';
+import { createDbClient, eq, Repository } from '@docio/db';
 
 export const installationTargetRenamedHandler = on(
   'installation_target.renamed',
-  async (event, c: Context<Env>) => {
+  async (event, _c: Context<Env>) => {
     console.log(
       `✏️ Installation target renamed for ID: ${event.installation.id}`,
     );
-    const db = createDbClient(c.env.db);
+    const db = createDbClient();
 
-    const repos = await db.repository.findMany({
-      where: {
-        installationId: event.installation.id,
-      },
+    const repos = await db.query.Repository.findMany({
+      where: eq(Repository.installationId, event.installation.id),
     });
 
     for (const repo of repos) {
@@ -23,12 +21,9 @@ export const installationTargetRenamedHandler = on(
       console.log(
         `📝 Updating repository name from ${repo.fullName} to ${newFullName}`,
       );
-      await db.repository.update({
-        where: { id: repo.id },
-        data: {
-          fullName: newFullName,
-        },
-      });
+      await db.update(Repository).set({
+        fullName: newFullName,
+      }).where(eq(Repository.id, repo.id));
     }
   },
 );

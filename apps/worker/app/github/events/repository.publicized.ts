@@ -1,21 +1,16 @@
 import { on } from '@docio/octo';
 import type { Context } from 'hono';
 import type { Env } from '@docio/env';
-import { createDbClient } from '@docio/db';
+import { createDbClient, eq, Repository } from '@docio/db';
 
 export const repositoryPublicizedHandler = on(
   'repository.publicized',
-  async (event, c: Context<Env>) => {
+  async (event, _c: Context<Env>) => {
     console.log(`🔓 Repository made public: ${event.repository.full_name}`);
-    const db = createDbClient(c.env.db);
+    const db = createDbClient();
 
-    await db.repository.update({
-      where: {
-        id: event.repository.id,
-      },
-      data: {
-        private: false,
-      },
-    });
+    await db.update(Repository).set({
+      private: false,
+    }).where(eq(Repository.id, event.repository.id));
   },
 );

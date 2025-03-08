@@ -10,24 +10,24 @@ export const installationRepositoriesRemovedHandler = on(
   'installation_repositories.removed',
   async (
     { repositories_removed: repositories },
-    c: Context<Env>,
+    _c: Context<Env>,
   ) => {
     console.log(`🗑️ Processing repositories removal request`);
-    const db = createDbClient(c.env.db);
+    const db = createDbClient();
     const qstash = new Client({
-      token: c.env.QSTASH_TOKEN,
-      baseUrl: c.env.QSTASH_URL,
+      token: Deno.env.get('QSTASH_TOKEN')!,
+      baseUrl: Deno.env.get('QSTASH_URL')!,
     });
 
-    const cloudflare = createCloudflare(c.env.CLOUDFLARE_API_TOKEN);
+    const cloudflare = createCloudflare(Deno.env.get('CLOUDFLARE_API_TOKEN')!);
 
     for (const repository of repositories ?? []) {
       console.log(`➖ Removing repository: ${repository.full_name}`);
       await removeRepo(repository.full_name, {
         db,
         cloudflare,
-        zoneId: c.env.CLOUDFLARE_ZONE_ID,
-        accountId: c.env.CLOUDFLARE_ACCOUNT_ID,
+        zoneId: Deno.env.get('CLOUDFLARE_ZONE_ID')!,
+        accountId: Deno.env.get('CLOUDFLARE_ACCOUNT_ID')!,
         qstash,
       });
     }

@@ -2,7 +2,7 @@ import { createOctoApp, createOctokit, on } from '@docio/octo';
 import { Octokit } from '@octokit/core';
 import type { Context } from 'hono';
 import type { Env } from '@docio/env';
-import { createDbClient } from '@docio/db';
+import { createDbClient, eq, Repository } from '@docio/db';
 
 export const pushHandler = on(
   'push',
@@ -26,15 +26,13 @@ export const pushHandler = on(
       return c.json({ message: 'Skipping non-default branch' }, 200);
     }
 
-    const db = createDbClient(c.env.db);
+    const db = createDbClient();
 
-    const { installation } = (await db.repository.findFirst({
-      where: {
-        id: repository.id,
-      },
-      include: {
+    const { installation } = (await db.query.Repository.findFirst({
+      where: eq(Repository.id, repository.id),
+      with: {
         installation: {
-          select: {
+          columns: {
             id: true,
           },
         },
@@ -49,8 +47,8 @@ export const pushHandler = on(
     const [owner, repo] = repository.full_name.split('/');
 
     const octoApp = createOctoApp(
-      c.env.GITHUB_APP_ID,
-      c.env.GITHUB_APP_PRIVATE_KEY,
+      Deno.env.get('GITHUB_APP_ID')!,
+      Deno.env.get('GITHUB_APP_PRIVATE_KEY')!,
     );
     const octokit = await createOctokit(octoApp, installation.id);
 
@@ -83,8 +81,8 @@ export const pushHandler = on(
     );
 
     const personalOctokit = new Octokit({
-      auth: c.env.GITHUB_PERSONAL_ACCESS_TOKEN,
-      baseUrl: c.env.OCTOMOCK_URL || undefined,
+      auth: Deno.env.get('GITHUB_PERSONAL_ACCESS_TOKEN')!,
+      baseUrl: Deno.env.get('OCTOMOCK_URL') || undefined,
     });
 
     console.log(`🚀 Triggering build-docs workflow`);

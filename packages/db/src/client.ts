@@ -1,10 +1,10 @@
-import { PrismaClient } from '@prisma/client';
-import { PrismaD1 } from '@prisma/adapter-d1';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import * as schema from './schema.ts';
 
-export function createDbClient(db: D1Database) {
-  const adapter = new PrismaD1(db);
-
-  return new PrismaClient({ adapter });
+export function createDbClient() {
+  return drizzle(Deno.env.get('DATABASE_URL')!, {
+    schema,
+  });
 }
 
-export { PrismaClient };
+export type DbClient = ReturnType<typeof createDbClient>;

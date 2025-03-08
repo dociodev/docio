@@ -1,5 +1,5 @@
 import type { Octokit } from '@octokit/core';
-import type { PrismaClient } from '@docio/db';
+import { type DbClient, Domain, eq, Repository } from '@docio/db';
 import { slugify } from '@docio/utils';
 import type { Cloudflare } from 'cloudflare';
 
@@ -15,7 +15,7 @@ export async function addRepo(
   }: {
     installationId: number;
     octokit: Octokit;
-    db: PrismaClient;
+    db: DbClient;
     cloudflare: Cloudflare;
     accountId: string;
     zoneId: string;
@@ -42,15 +42,14 @@ export async function addRepo(
     },
   );
 
-  await db.repository.create({
-    data: {
-      id: repoData.id,
-      installationId: installationId,
-      name: repoData.name,
-      fullName: repoData.full_name,
-      private: repoData.private,
-      defaultBranch: repoData.default_branch,
-    },
+  await db.insert(Repository).values({
+    id: repoData.id,
+    installationId: installationId,
+    name: repoData.name,
+    fullName: repoData.full_name,
+    private: repoData.private,
+    defaultBranch: repoData.default_branch,
+    updatedAt: new Date(),
   });
 
   console.log(
@@ -84,29 +83,26 @@ export async function addRepo(
     throw new Error('Failed to create domain');
   }
 
-  await db.domain.create({
-    data: {
-      id: domain.id!,
-      name: domain.name!,
-      isDocioDomain: true,
-      dnsRecordId: dnsRecord.id!,
-      repositoryId: repoData.id,
-      isVerified: true,
-    },
+  await db.insert(Domain).values({
+    id: domain.id!,
+    name: domain.name!,
+    isDocioDomain: true,
+    dnsRecordId: dnsRecord.id!,
+    repositoryId: repoData.id,
+    isVerified: true,
+    updatedAt: new Date(),
   });
 }
 
 async function getUniqDomain(
   repositorySlug: string,
   id: number,
-  { db }: { db: PrismaClient },
+  { db }: { db: DbClient },
 ) {
   const docioSubdomain = `${repositorySlug}.docio.dev`;
 
-  const existingDomain = await db.domain.findFirst({
-    where: {
-      name: docioSubdomain,
-    },
+  const existingDomain = await db.query.Domain.findFirst({
+    where: eq(Domain.name, docioSubdomain),
   });
 
   return existingDomain

@@ -4,7 +4,7 @@ import type { Env } from '@docio/env';
 
 export const issueCommentCreatedHandler = on(
   'issue_comment.created',
-  async (event, c: Context<Env>) => {
+  async (event, _c: Context<Env>) => {
     console.log(event);
   },
 );

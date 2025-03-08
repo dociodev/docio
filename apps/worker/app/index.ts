@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import type { Env } from '@docio/env';
-import { createDbClient } from '@docio/db';
+import { createDbClient, eq, Repository } from '@docio/db';
 import { createOctoApp, createOctokit, getOctokitToken } from '@docio/octo';
 import { repositoryApi } from './api/repository.ts';
 import { eventMiddleware } from './github/events/index.ts';
@@ -47,7 +47,10 @@ app.post(
     }
 
     if (
-      await signRequestBody(c.env.GITHUB_APP_WEBHOOK_SECRET, body) !== signature
+      await signRequestBody(
+        Deno.env.get('GITHUB_APP_WEBHOOK_SECRET')!,
+        body,
+      ) !== signature
     ) {
       return c.json({ message: 'Invalid signature' }, 400);
     }
@@ -69,7 +72,7 @@ app.get(
   async (c, next) => {
     const { 'X-Worker-Secret': secret } = c.req.valid('header');
 
-    if (secret !== c.env.WORKER_SECRET) {
+    if (secret !== Deno.env.get('WORKER_SECRET')!) {
       return c.json({ message: 'Invalid secret' }, 401);
     }
 
@@ -87,14 +90,16 @@ app.get(
     const { owner, repo, ref } = c.req.valid('param');
     console.log(`📦 Fetching repository content: ${owner}/${repo}@${ref}`);
 
-    const db = createDbClient(c.env.db);
+    const db = createDbClient();
 
-    const repository = await db.repository.findFirst({
-      where: {
-        fullName: `${owner}/${repo}`,
-      },
-      select: {
-        installation: true,
+    const repository = await db.query.Repository.findFirst({
+      where: eq(Repository.fullName, `${owner}/${repo}`),
+      with: {
+        installation: {
+          columns: {
+            id: true,
+          },
+        },
       },
     });
 
@@ -106,8 +111,8 @@ app.get(
     }
 
     const app = createOctoApp(
-      c.env.GITHUB_APP_ID!,
-      c.env.GITHUB_APP_PRIVATE_KEY!,
+      Deno.env.get('GITHUB_APP_ID')!,
+      Deno.env.get('GITHUB_APP_PRIVATE_KEY')!,
     );
     const octokit = await createOctokit(app, repository.installation.id);
     const token = await getOctokitToken(octokit, repository.installation.id);

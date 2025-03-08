@@ -14,15 +14,15 @@ export const installationRepositoriesAddedHandler = on(
     console.log(
       `📦 Adding new repositories for installation ID: ${installation.id}`,
     );
-    const db = createDbClient(c.env.db);
+    const db = createDbClient();
 
     const app = createOctoApp(
-      c.env.GITHUB_APP_ID!,
-      c.env.GITHUB_APP_PRIVATE_KEY!,
+      Deno.env.get('GITHUB_APP_ID')!,
+      Deno.env.get('GITHUB_APP_PRIVATE_KEY')!,
     );
     const octokit = await createOctokit(app, installation.id);
 
-    const cloudflare = createCloudflare(c.env.CLOUDFLARE_API_TOKEN);
+    const cloudflare = createCloudflare(Deno.env.get('CLOUDFLARE_API_TOKEN')!);
 
     for (const repository of repositories ?? []) {
       console.log(`➕ Setting up repository: ${repository.full_name}`);
@@ -31,8 +31,8 @@ export const installationRepositoriesAddedHandler = on(
         octokit,
         db,
         cloudflare,
-        accountId: c.env.CLOUDFLARE_ACCOUNT_ID,
-        zoneId: c.env.CLOUDFLARE_ZONE_ID,
+        accountId: Deno.env.get('CLOUDFLARE_ACCOUNT_ID')!,
+        zoneId: Deno.env.get('CLOUDFLARE_ZONE_ID')!,
       });
     }
   },

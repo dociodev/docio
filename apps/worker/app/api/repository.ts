@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import type { Env } from '@docio/env';
 import { Client, Receiver } from '@upstash/qstash';
-import { createDbClient } from '@docio/db';
+import { createDbClient, Domain, eq, Repository } from '@docio/db';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { removeRepo } from '../github/utils/remove-repo.ts';
@@ -15,8 +15,8 @@ repositoryApi.delete(
   async (c, next) => {
     console.log(`🔐 Verifying QStash signature for repository deletion`);
     const receiver = new Receiver({
-      currentSigningKey: c.env.QSTASH_CURRENT_SIGNING_KEY,
-      nextSigningKey: c.env.QSTASH_NEXT_SIGNING_KEY,
+      currentSigningKey: Deno.env.get('QSTASH_CURRENT_SIGNING_KEY')!,
+      nextSigningKey: Deno.env.get('QSTASH_NEXT_SIGNING_KEY')!,
     });
 
     const isValid = await receiver.verify({
@@ -40,13 +40,11 @@ repositoryApi.delete(
     const { id } = c.req.valid('param');
     console.log(`🗑️ Processing repository deletion request for ID: ${id}`);
 
-    const db = createDbClient(c.env.db);
+    const db = createDbClient();
 
-    const repo = await db.repository.findUnique({
-      where: {
-        id,
-      },
-      select: {
+    const repo = await db.query.Repository.findFirst({
+      where: eq(Repository.id, id),
+      columns: {
         fullName: true,
       },
     });
@@ -56,18 +54,18 @@ repositoryApi.delete(
       return c.json({ message: 'Repository not found' }, 404);
     }
 
-    const cloudflare = createCloudflare(c.env.CLOUDFLARE_API_TOKEN);
+    const cloudflare = createCloudflare(Deno.env.get('CLOUDFLARE_API_TOKEN')!);
     const qstash = new Client({
-      token: c.env.QSTASH_TOKEN,
-      baseUrl: c.env.QSTASH_URL,
+      token: Deno.env.get('QSTASH_TOKEN')!,
+      baseUrl: Deno.env.get('QSTASH_URL')!,
     });
 
     console.log(`🚮 Removing repository: ${repo.fullName}`);
     await removeRepo(repo.fullName, {
       db,
       cloudflare,
-      zoneId: c.env.CLOUDFLARE_ZONE_ID,
-      accountId: c.env.CLOUDFLARE_ACCOUNT_ID,
+      zoneId: Deno.env.get('CLOUDFLARE_ZONE_ID')!,
+      accountId: Deno.env.get('CLOUDFLARE_ACCOUNT_ID')!,
       qstash,
     });
   },
@@ -84,7 +82,7 @@ repositoryApi.post(
   async (c, next) => {
     const { 'X-Worker-Secret': secret } = c.req.valid('header');
 
-    if (secret !== c.env.WORKER_SECRET) {
+    if (secret !== Deno.env.get('WORKER_SECRET')!) {
       return c.json({ message: 'Invalid secret' }, 401);
     }
 
@@ -101,25 +99,23 @@ repositoryApi.post(
   async (c) => {
     const { id, deploymentId, state } = c.req.valid('param');
 
-    const db = createDbClient(c.env.db);
+    const db = createDbClient();
 
-    const repository = await db.repository.findUnique({
-      where: {
-        id,
-      },
-      select: {
+    const repository = await db.query.Repository.findFirst({
+      where: eq(Repository.id, id),
+      columns: {
         fullName: true,
+      },
+      with: {
         domains: {
-          select: {
+          columns: {
             name: true,
             isDocioDomain: true,
           },
-          where: {
-            isVerified: true,
-          },
+          where: eq(Domain.isVerified, true),
         },
         installation: {
-          select: {
+          columns: {
             id: true,
           },
         },
@@ -133,8 +129,8 @@ repositoryApi.post(
     const [owner, repo] = repository.fullName.split('/');
 
     const octoApp = createOctoApp(
-      c.env.GITHUB_APP_ID,
-      c.env.GITHUB_APP_PRIVATE_KEY,
+      Deno.env.get('GITHUB_APP_ID')!,
+      Deno.env.get('GITHUB_APP_PRIVATE_KEY')!,
     );
     const octokit = await createOctokit(octoApp, repository.installation.id);
 

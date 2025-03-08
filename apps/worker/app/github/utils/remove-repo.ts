@@ -1,4 +1,4 @@
-import type { PrismaClient } from '@docio/db';
+import { type DbClient, eq, Repository, Task } from '@docio/db';
 import type { Cloudflare } from 'cloudflare';
 import type { Client } from '@upstash/qstash';
 
@@ -11,7 +11,7 @@ export async function removeRepo(
     accountId,
     qstash,
   }: {
-    db: PrismaClient;
+    db: DbClient;
     cloudflare: Cloudflare;
     zoneId: string;
     accountId: string;
@@ -22,24 +22,23 @@ export async function removeRepo(
     `🗑️ Starting removal process for repository: ${repositoryFullName}`,
   );
 
-  const repo = await db.repository.findFirst({
-    where: {
-      fullName: repositoryFullName,
-    },
-    select: {
+  const repo = await db.query.Repository.findFirst({
+    where: eq(Repository.fullName, repositoryFullName),
+    columns: {
       id: true,
+    },
+    with: {
       domains: {
-        where: {
+        columns: {
           isDocioDomain: true,
+          dnsRecordId: true,
         },
       },
       tasks: {
-        select: {
+        columns: {
           id: true,
         },
-        where: {
-          status: 'PENDING',
-        },
+        where: eq(Task.status, 'PENDING'),
       },
     },
   });
@@ -93,9 +92,5 @@ export async function removeRepo(
     });
   }
 
-  await db.repository.delete({
-    where: {
-      id: repo.id,
-    },
-  });
+  await db.delete(Repository).where(eq(Repository.id, repo.id));
 }

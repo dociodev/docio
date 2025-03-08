@@ -36,8 +36,11 @@
     "npm:@types/node@*": "22.12.0",
     "npm:@upstash/qstash@^2.7.22": "2.7.22",
     "npm:cloudflare@^4.1.0": "4.1.0",
+    "npm:drizzle-orm@0.40": "0.40.0_@cloudflare+workers-types@4.20250224.0_@prisma+client@6.4.1__prisma@6.4.1___esbuild@0.17.19_prisma@6.4.1__esbuild@0.17.19",
+    "npm:drizzle-prisma-generator@~0.1.7": "0.1.7",
     "npm:hono@^4.7.1": "4.7.2",
     "npm:hono@^4.7.2": "4.7.2",
+    "npm:postgres@^3.4.5": "3.4.5",
     "npm:prisma@^6.4.1": "6.4.1_esbuild@0.17.19",
     "npm:rspress@1.42.0": "1.42.0",
     "npm:rspress@^1.41.2": "1.42.0",
@@ -683,13 +686,16 @@
         "prisma"
       ]
     },
+    "@prisma/debug@5.22.0": {
+      "integrity": "sha512-AUt44v3YJeggO2ZU5BkXI7M4hu9BF2zzH2iF2V5pyXT/lRTyWiElZ7It+bRH1EshoMRxHgpYg4VB6rCM+mG5jQ=="
+    },
     "@prisma/debug@6.4.1": {
       "integrity": "sha512-Q9xk6yjEGIThjSD8zZegxd5tBRNHYd13GOIG0nLsanbTXATiPXCLyvlYEfvbR2ft6dlRsziQXfQGxAgv7zcMUA=="
     },
     "@prisma/driver-adapter-utils@6.4.1": {
       "integrity": "sha512-WIVq6QUzz9HJXNa+6LmyLrW/KHOFQwmXYvpaVVECjwAUaAQXFw4g85i68GFPTYrfozwz5CntdHVVzXxInkk0fA==",
       "dependencies": [
-        "@prisma/debug"
+        "@prisma/debug@6.4.1"
       ]
     },
     "@prisma/engines-version@6.4.0-29.a9055b89e58b4b5bfb59600785423b1db3d0e75d": {
@@ -698,7 +704,7 @@
     "@prisma/engines@6.4.1": {
       "integrity": "sha512-KldENzMHtKYwsOSLThghOIdXOBEsfDuGSrxAZjMnimBiDKd3AE4JQ+Kv+gBD/x77WoV9xIPf25GXMWffXZ17BA==",
       "dependencies": [
-        "@prisma/debug",
+        "@prisma/debug@6.4.1",
         "@prisma/engines-version",
         "@prisma/fetch-engine",
         "@prisma/get-platform"
@@ -707,15 +713,21 @@
     "@prisma/fetch-engine@6.4.1": {
       "integrity": "sha512-uZ5hVeTmDspx7KcaRCNoXmcReOD+84nwlO2oFvQPRQh9xiFYnnUKDz7l9bLxp8t4+25CsaNlgrgilXKSQwrIGQ==",
       "dependencies": [
-        "@prisma/debug",
+        "@prisma/debug@6.4.1",
         "@prisma/engines-version",
         "@prisma/get-platform"
+      ]
+    },
+    "@prisma/generator-helper@5.22.0": {
+      "integrity": "sha512-LwqcBQ5/QsuAaLNQZAIVIAJDJBMjHwMwn16e06IYx/3Okj/xEEfw9IvrqB2cJCl3b2mCBlh3eVH0w9WGmi4aHg==",
+      "dependencies": [
+        "@prisma/debug@5.22.0"
       ]
     },
     "@prisma/get-platform@6.4.1": {
       "integrity": "sha512-gXqZaDI5scDkBF8oza7fOD3Q3QMD0e0rBynlzDDZdTWbWmzjuW58PRZtj+jkvKje2+ZigCWkH8SsWZAsH6q1Yw==",
       "dependencies": [
-        "@prisma/debug"
+        "@prisma/debug@6.4.1"
       ]
     },
     "@remix-run/router@1.22.0": {
@@ -1510,6 +1522,19 @@
         "dom-serializer@2.0.0",
         "domelementtype",
         "domhandler@5.0.3"
+      ]
+    },
+    "drizzle-orm@0.40.0_@cloudflare+workers-types@4.20250224.0_@prisma+client@6.4.1__prisma@6.4.1___esbuild@0.17.19_prisma@6.4.1__esbuild@0.17.19": {
+      "integrity": "sha512-7ptk/HQiMSrEZHnAsSlBESXWj52VwgMmyTEfoNmpNN2ZXpcz13LwHfXTIghsAEud7Z5UJhDOp8U07ujcqme7wg==",
+      "dependencies": [
+        "@cloudflare/workers-types@4.20250224.0",
+        "@prisma/client"
+      ]
+    },
+    "drizzle-prisma-generator@0.1.7": {
+      "integrity": "sha512-KW+Z6W4hjvsiOCCPEmGyO+Oal7KPv2yQ3uZzHasaVIn+gUWGrkcy8BCDEp1h7uRBRSAd/l17EM4DfljhgYXxBw==",
+      "dependencies": [
+        "@prisma/generator-helper"
       ]
     },
     "dunder-proto@1.0.1": {
@@ -2830,6 +2855,9 @@
         "source-map-js"
       ]
     },
+    "postgres@3.4.5": {
+      "integrity": "sha512-cDWgoah1Gez9rN3H4165peY9qfpEo+SA61oQv65O3cRUE1pOEoJWwddwcqKE8XZYjbblOJlYDlLV4h67HrEVDg=="
+    },
     "printable-characters@1.0.42": {
       "integrity": "sha512-dKp+C4iXWK4vVYZmYSd0KBH5F/h1HoZRsbJ82AVKRO3PEo8L4lBS/vLwhVtpwwuYcoIsVY+1JYKR268yn480uQ=="
     },
@@ -3702,6 +3730,9 @@
           "jsr:@david/dax@0.42",
           "npm:@prisma/adapter-d1@^6.4.1",
           "npm:@prisma/client@^6.4.1",
+          "npm:drizzle-orm@0.40",
+          "npm:drizzle-prisma-generator@~0.1.7",
+          "npm:postgres@^3.4.5",
           "npm:prisma@^6.4.1"
         ]
       },

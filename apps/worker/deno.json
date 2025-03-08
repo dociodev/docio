@@ -2,14 +2,6 @@
   "name": "@docio/worker",
   "version": "0.0.1",
   "compilerOptions": {
-    "strict": true,
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
-    "types": [
-      "@cloudflare/workers-types/2023-07-01"
-    ],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"
   },
@@ -27,8 +19,7 @@
     "zod": "npm:zod@^3.24.2"
   },
   "tasks": {
-    "wrangler": "node ../../node_modules/.bin/wrangler",
-    "dev": "deno task wrangler dev --port 8786",
+    "dev": "deno serve --port 8786 --host 127.0.0.1 -A --watch app/index.ts",
     "check": "deno check app/index.ts"
   }
 }
