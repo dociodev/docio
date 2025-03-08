@@ -1,6 +1,6 @@
 import type { Schema } from '@octokit/webhooks-types';
 
-export interface Env {
+export interface HonoEnv {
   // Bindings: {
   // GITHUB_APP_WEBHOOK_SECRET: string;
   // GITHUB_APP_PRIVATE_KEY: string;
