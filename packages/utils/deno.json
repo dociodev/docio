@@ -6,10 +6,7 @@
   },
   "imports": {},
   "tasks": {
-    "check": "deno check mod.ts",
-    "test": "deno test"
-  },
-  "test": {
+    "test": {
     "include": ["src/**/*.spec.ts"]
   }
 }

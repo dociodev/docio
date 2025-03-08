@@ -1,4 +1,4 @@
-import { db, eq, Repository, Task } from '@docio/db';
+import { db, eq, Repository } from '@docio/db';
 import { env } from '@docio/env';
 import { cloudflare } from '@docio/cloudflare';
 
@@ -21,12 +21,6 @@ export async function removeRepo(
           dnsRecordId: true,
         },
       },
-      tasks: {
-        columns: {
-          id: true,
-        },
-        where: eq(Task.status, 'PENDING'),
-      },
     },
   });
 
@@ -34,7 +28,7 @@ export async function removeRepo(
     return false;
   }
 
-  const { domains, tasks } = repo;
+  const { domains } = repo;
 
   for (const domain of domains) {
     if (!domain.dnsRecordId) {

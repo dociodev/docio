@@ -27,7 +27,8 @@ export default {
 
 async function main() {
   try {
-    await $`act repository_dispatch -s WORKER_SECRET=${env.WORKER_SECRET} -s WORKER_URL=${env.WORKER_URL} -s CLOUDFLARE_API_TOKEN=${env.CLOUDFLARE_API_TOKEN} -s CLOUDFLARE_ACCOUNT_ID=${env.CLOUDFLARE_ACCOUNT_ID} -s CLOUDFLARE_ZONE_ID=${env.CLOUDFLARE_ZONE_ID} -e ./apps/octomock/tmp/payload.json`
+    await $`act repository_dispatch -s WORKER_SECRET=${env.WORKER_SECRET} -s WORKER_URL=${env
+      .WORKER_URL!} -s CLOUDFLARE_API_TOKEN=${env.CLOUDFLARE_API_TOKEN} -s CLOUDFLARE_ACCOUNT_ID=${env.CLOUDFLARE_ACCOUNT_ID} -s CLOUDFLARE_ZONE_ID=${env.CLOUDFLARE_ZONE_ID} -e ./apps/octomock/tmp/payload.json`
       .cwd('../..');
   } catch (error) {
     console.error(error);

@@ -5,7 +5,7 @@ import { db, eq, Repository } from '@docio/db';
 
 export const repositoryPublicizedHandler = on(
   'repository.publicized',
-  async (event, _c: Context<HonoEnv>) => {
+  (event, _c: Context<HonoEnv>) => {
     console.log(`🔓 Repository made public: ${event.repository.full_name}`);
 
     _c.executionCtx.waitUntil(

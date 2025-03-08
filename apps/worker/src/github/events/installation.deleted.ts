@@ -7,7 +7,7 @@ import { removeRepo } from '../utils/remove-repo.ts';
 // app is uninstalled
 export const installationDeletedHandler = on(
   'installation.deleted',
-  async ({ installation }, _c: Context<HonoEnv>) => {
+  ({ installation }, _c: Context<HonoEnv>) => {
     console.log(`🗑️ Installation deleted for ID: ${installation.id}`);
 
     _c.executionCtx.waitUntil(

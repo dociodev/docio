@@ -5,7 +5,7 @@ import { db, eq, Repository } from '@docio/db';
 
 export const repositoryRenamedHandler = on(
   'repository.renamed',
-  async (event, _c: Context<HonoEnv>) => {
+  (event, _c: Context<HonoEnv>) => {
     console.log(`📝 Repository renamed: ${event.repository.full_name}`);
 
     _c.executionCtx.waitUntil(

@@ -7,7 +7,7 @@ import { addRepo } from '../utils/add-repo.ts';
 // app is installed
 export const installationCreatedHandler = on(
   'installation.created',
-  async ({ installation, repositories }, _c: Context<HonoEnv>) => {
+  ({ installation, repositories }, _c: Context<HonoEnv>) => {
     console.log(`📦 New installation created for ID: ${installation.id}`);
 
     _c.executionCtx.waitUntil(

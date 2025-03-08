@@ -5,7 +5,7 @@ import { removeRepo } from '../utils/remove-repo.ts';
 
 export const installationRepositoriesRemovedHandler = on(
   'installation_repositories.removed',
-  async (
+  (
     { repositories_removed: repositories },
     _c: Context<HonoEnv>,
   ) => {

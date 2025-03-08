@@ -1,4 +1,4 @@
-name: Deploy Worker
+name: Test
 
 on:
   pull_request:
@@ -23,7 +23,10 @@ jobs:
           deno-version: v2.2.3
 
       - name: Test
-        run: deno task -r test
+        run: deno test
 
       - name: Typecheck
         run: deno task typecheck
+
+      - name: Lint
+        run: deno lint

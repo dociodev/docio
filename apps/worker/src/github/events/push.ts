@@ -6,7 +6,7 @@ import { db, eq, Repository } from '@docio/db';
 
 export const pushHandler = on(
   'push',
-  async ({ repository, ref }, c: Context<HonoEnv>) => {
+  ({ repository, ref }, c: Context<HonoEnv>) => {
     console.log(`📥 Push event received for ${repository.full_name}@${ref}`);
 
     const repoName = repository.name;

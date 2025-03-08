@@ -32,10 +32,14 @@
     "@std/tar": "jsr:@std/tar@^0.1.5",
     "rspress": "npm:rspress@^1.41.2"
   },
-
   "nodeModulesDir": "auto",
   "workspace": ["./packages/*", "./apps/*", "./tools"],
   "fmt": {
     "singleQuote": true
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-slow-types"]
+    }
   }
 }

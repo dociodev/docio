@@ -5,7 +5,7 @@ import { addRepo } from '../utils/add-repo.ts';
 
 export const installationRepositoriesAddedHandler = on(
   'installation_repositories.added',
-  async (
+  (
     { repositories_added: repositories, installation },
     _c: Context<HonoEnv>,
   ) => {

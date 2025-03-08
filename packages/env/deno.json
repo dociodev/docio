@@ -5,15 +5,7 @@
     ".": "./mod.ts"
   },
   "imports": {
-    "@cloudflare/workers-types": "npm:@cloudflare/workers-types@^4.20250224.0",
     "@octokit/webhooks-types": "npm:@octokit/webhooks-types@^7.6.1"
   },
-  "tasks": {
-    "check": "deno check mod.ts"
-  },
-  "compilerOptions": {
-    "types": [
-      "@cloudflare/workers-types/2023-07-01"
-    ]
-  }
+  "tasks": {}
 }
