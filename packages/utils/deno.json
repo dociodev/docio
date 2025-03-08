@@ -5,8 +5,7 @@
     ".": "./mod.ts"
   },
   "imports": {},
-  "tasks": {
-    "test": {
+  "test": {
     "include": ["src/**/*.spec.ts"]
   }
 }
