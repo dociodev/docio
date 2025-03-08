@@ -14,7 +14,7 @@ await new Command()
         new Command()
           .description('Generate a db client')
           .action(async () => {
-            await $`node ../../node_modules/.bin/prisma generate`;
+            await $`prisma generate`;
           }),
       ),
   )
@@ -42,7 +42,7 @@ await new Command()
           })
           .action(async ({ remote }) => {
             await $`deno --env-file=../../.env -A ../../node_modules/.bin/prisma ${
-              remote ? 'migrate deploy' : ['db', 'push']
+              remote ? ['migrate', 'deploy'] : ['db', 'push']
             }`;
           }),
       ),
