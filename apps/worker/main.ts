@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { env, type HonoEnv } from '@docio/env';
-import { createDbClient, eq, Repository } from '@docio/db';
+import { db, eq, Repository } from '@docio/db';
 import { createOctokit, getOctokitToken } from '@docio/octo';
 import { repositoryApi } from './src/api/repository.ts';
 import { eventMiddleware } from './src/github/events/index.ts';
@@ -89,8 +89,6 @@ app.get(
   async (c) => {
     const { owner, repo, ref } = c.req.valid('param');
     console.log(`📦 Fetching repository content: ${owner}/${repo}@${ref}`);
-
-    const db = createDbClient();
 
     const repository = await db.query.Repository.findFirst({
       where: eq(Repository.fullName, `${owner}/${repo}`),

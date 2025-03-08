@@ -1,13 +1,10 @@
-import { createDbClient, eq, Repository, Task } from '@docio/db';
+import { db, eq, Repository, Task } from '@docio/db';
 import { env } from '@docio/env';
-import { createCloudflare } from '@docio/cloudflare';
+import { cloudflare } from '@docio/cloudflare';
 
 export async function removeRepo(
   repositoryFullName: string,
 ) {
-  const cloudflare = createCloudflare();
-  const db = createDbClient();
-
   console.log(
     `🗑️ Starting removal process for repository: ${repositoryFullName}`,
   );

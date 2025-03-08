@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import type { HonoEnv } from '@docio/env';
-import { createDbClient, Domain, eq, Repository } from '@docio/db';
+import { db, Domain, eq, Repository } from '@docio/db';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { createOctokit } from '@docio/octo';
@@ -35,8 +35,6 @@ repositoryApi.post(
   ),
   async (c) => {
     const { id, deploymentId, state } = c.req.valid('param');
-
-    const db = createDbClient();
 
     const repository = await db.query.Repository.findFirst({
       where: eq(Repository.id, id),

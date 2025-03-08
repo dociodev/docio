@@ -4,7 +4,7 @@
   "exports": {},
   "imports": {},
   "tasks": {
-    "docio": "deno run --allow-net --allow-write --allow-read --allow-env --allow-run cli.ts",
+    "docio": "deno run --env-file=../.env --allow-net --allow-write --allow-read --allow-env --allow-run cli.ts",
     "check": "deno check cli.ts"
   }
 }

@@ -1,7 +1,7 @@
-import { createDbClient, Domain, eq, Repository } from '@docio/db';
+import { db, Domain, eq, Repository } from '@docio/db';
 import { slugify } from '@docio/utils';
 import { env } from '@docio/env';
-import { createCloudflare } from '@docio/cloudflare';
+import { cloudflare } from '@docio/cloudflare';
 import { createOctokit } from '@docio/octo';
 
 export async function addRepo(
@@ -12,8 +12,6 @@ export async function addRepo(
     installationId: number;
   },
 ) {
-  const db = createDbClient();
-  const cloudflare = createCloudflare();
   const octokit = await createOctokit(installationId);
 
   console.log(`📝 Setting up repository: ${repositoryFullName}`);
@@ -92,8 +90,6 @@ async function getUniqDomain(
   repositorySlug: string,
   id: number,
 ) {
-  const db = createDbClient();
-
   const docioSubdomain = `${repositorySlug}.docio.dev`;
 
   const existingDomain = await db.query.Domain.findFirst({

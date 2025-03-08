@@ -2,7 +2,7 @@ import { createOctokit, on } from '@docio/octo';
 import { Octokit } from '@octokit/core';
 import type { Context } from 'hono';
 import { env, type HonoEnv } from '@docio/env';
-import { createDbClient, eq, Repository } from '@docio/db';
+import { db, eq, Repository } from '@docio/db';
 
 export const pushHandler = on(
   'push',
@@ -25,8 +25,6 @@ export const pushHandler = on(
       console.log(`⏭️ Skipping non-default branch: ${normalizedRef}`);
       return c.json({ message: 'Skipping non-default branch' }, 200);
     }
-
-    const db = createDbClient();
 
     const { installation } = (await db.query.Repository.findFirst({
       where: eq(Repository.id, repository.id),

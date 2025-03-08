@@ -1,7 +1,7 @@
 import { on } from '@docio/octo';
 import type { Context } from 'hono';
 import type { HonoEnv } from '@docio/env';
-import { createDbClient, eq, Repository } from '@docio/db';
+import { db, eq, Repository } from '@docio/db';
 
 export const installationTargetRenamedHandler = on(
   'installation_target.renamed',
@@ -9,7 +9,6 @@ export const installationTargetRenamedHandler = on(
     console.log(
       `✏️ Installation target renamed for ID: ${event.installation.id}`,
     );
-    const db = createDbClient();
 
     const repos = await db.query.Repository.findMany({
       where: eq(Repository.installationId, event.installation.id),

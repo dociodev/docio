@@ -1,5 +1,5 @@
 import { on } from '@docio/octo';
-import { createDbClient, eq, Installation } from '@docio/db';
+import { db, eq, Installation } from '@docio/db';
 import type { HonoEnv } from '@docio/env';
 import type { Context } from 'hono';
 import { removeRepo } from '../utils/remove-repo.ts';
@@ -9,7 +9,6 @@ export const installationDeletedHandler = on(
   'installation.deleted',
   async ({ installation }, _c: Context<HonoEnv>) => {
     console.log(`🗑️ Installation deleted for ID: ${installation.id}`);
-    const db = createDbClient();
 
     const { repositories } = (await db.query.Installation.findFirst({
       where: eq(Installation.id, installation.id),
