@@ -8,9 +8,11 @@ export const repositoryRenamedHandler = on(
   async (event, _c: Context<HonoEnv>) => {
     console.log(`📝 Repository renamed: ${event.repository.full_name}`);
 
-    await db.update(Repository).set({
-      name: event.repository.name,
-      fullName: event.repository.full_name,
-    }).where(eq(Repository.id, event.repository.id));
+    _c.executionCtx.waitUntil(
+      db.update(Repository).set({
+        name: event.repository.name,
+        fullName: event.repository.full_name,
+      }).where(eq(Repository.id, event.repository.id)),
+    );
   },
 );

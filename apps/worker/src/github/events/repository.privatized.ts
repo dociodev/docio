@@ -8,8 +8,10 @@ export const repositoryPrivatizedHandler = on(
   async (event, _c: Context<HonoEnv>) => {
     console.log(`🔒 Repository made private: ${event.repository.full_name}`);
 
-    await db.update(Repository).set({
-      private: true,
-    }).where(eq(Repository.id, event.repository.id));
+    _c.executionCtx.waitUntil(
+      db.update(Repository).set({
+        private: true,
+      }).where(eq(Repository.id, event.repository.id)),
+    );
   },
 );

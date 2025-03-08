@@ -47,4 +47,12 @@ await new Command()
           }),
       ),
   )
+  .command(
+    'studio',
+    new Command()
+      .description('Open the Prisma Studio')
+      .action(async () => {
+        await $`deno --env-file=../../.env -A ../../node_modules/.bin/prisma studio`;
+      }),
+  )
   .parse(Deno.args);

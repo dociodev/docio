@@ -8,8 +8,10 @@ export const repositoryPublicizedHandler = on(
   async (event, _c: Context<HonoEnv>) => {
     console.log(`🔓 Repository made public: ${event.repository.full_name}`);
 
-    await db.update(Repository).set({
-      private: false,
-    }).where(eq(Repository.id, event.repository.id));
+    _c.executionCtx.waitUntil(
+      db.update(Repository).set({
+        private: false,
+      }).where(eq(Repository.id, event.repository.id)),
+    );
   },
 );

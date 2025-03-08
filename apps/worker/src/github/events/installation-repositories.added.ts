@@ -13,11 +13,19 @@ export const installationRepositoriesAddedHandler = on(
       `📦 Adding new repositories for installation ID: ${installation.id}`,
     );
 
-    for (const repository of repositories ?? []) {
-      console.log(`➕ Setting up repository: ${repository.full_name}`);
-      await addRepo(repository.full_name, {
-        installationId: installation.id,
-      });
-    }
+    _c.executionCtx.waitUntil(
+      Promise.all(
+        (repositories ?? []).map((repository) =>
+          addRepo(repository.full_name, {
+            installationId: installation.id,
+          }).catch((err) => {
+            console.error(
+              `❌ Error adding repository: ${repository.full_name}`,
+              err,
+            );
+          })
+        ),
+      ),
+    );
   },
 );

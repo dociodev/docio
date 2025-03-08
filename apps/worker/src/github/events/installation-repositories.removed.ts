@@ -10,9 +10,18 @@ export const installationRepositoriesRemovedHandler = on(
     _c: Context<HonoEnv>,
   ) => {
     console.log(`🗑️ Processing repositories removal request`);
-    for (const repository of repositories ?? []) {
-      console.log(`➖ Removing repository: ${repository.full_name}`);
-      await removeRepo(repository.full_name);
-    }
+
+    _c.executionCtx.waitUntil(
+      Promise.all(
+        (repositories ?? []).map((repository) =>
+          removeRepo(repository.full_name).catch((err) => {
+            console.error(
+              `❌ Error removing repository: ${repository.full_name}`,
+              err,
+            );
+          })
+        ),
+      ),
+    );
   },
 );

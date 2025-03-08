@@ -10,22 +10,28 @@ export const installationDeletedHandler = on(
   async ({ installation }, _c: Context<HonoEnv>) => {
     console.log(`🗑️ Installation deleted for ID: ${installation.id}`);
 
-    const { repositories } = (await db.query.Installation.findFirst({
-      where: eq(Installation.id, installation.id),
-      with: {
-        repositories: {
-          columns: {
-            fullName: true,
+    _c.executionCtx.waitUntil(
+      Promise.resolve().then(async () => {
+        const { repositories } = (await db.query.Installation.findFirst({
+          where: eq(Installation.id, installation.id),
+          with: {
+            repositories: {
+              columns: {
+                fullName: true,
+              },
+            },
           },
-        },
-      },
-    })) ?? { repositories: [] };
+        })) ?? { repositories: [] };
 
-    for (const repository of repositories ?? []) {
-      console.log(`➖ Removing repository: ${repository.fullName}`);
-      await removeRepo(repository.fullName);
-    }
+        for (const repository of repositories ?? []) {
+          console.log(`➖ Removing repository: ${repository.fullName}`);
+          await removeRepo(repository.fullName);
+        }
 
-    await db.delete(Installation).where(eq(Installation.id, installation.id));
+        await db.delete(Installation).where(
+          eq(Installation.id, installation.id),
+        );
+      }),
+    );
   },
 );

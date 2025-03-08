@@ -14,15 +14,28 @@ export const installationTargetRenamedHandler = on(
       where: eq(Repository.installationId, event.installation.id),
     });
 
-    for (const repo of repos) {
-      const newFullName = [event.account.login, repo.fullName.split('/')[1]]
-        .join('/');
-      console.log(
-        `📝 Updating repository name from ${repo.fullName} to ${newFullName}`,
-      );
-      await db.update(Repository).set({
-        fullName: newFullName,
-      }).where(eq(Repository.id, repo.id));
-    }
+    _c.executionCtx.waitUntil(
+      Promise.all(
+        repos.map((repo) => {
+          const newFullName = [event.account.login, repo.fullName.split('/')[1]]
+            .join('/');
+          console.log(
+            `📝 Updating repository name from ${repo.fullName} to ${newFullName}`,
+          );
+          return db
+            .update(Repository)
+            .set({
+              fullName: newFullName,
+            })
+            .where(eq(Repository.id, repo.id))
+            .catch((err) => {
+              console.error(
+                `❌ Error updating repository name: ${repo.fullName}`,
+                err,
+              );
+            });
+        }),
+      ),
+    );
   },
 );

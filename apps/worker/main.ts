@@ -145,4 +145,14 @@ app.get(
 
 app.route('/api', repositoryApi);
 
-export default app;
+export default {
+  fetch: (request: Request) =>
+    app.fetch(request, {}, {
+      waitUntil: (promise: Promise<unknown>) => {
+        promise.catch((err) => {
+          console.error(err);
+        });
+      },
+      passThroughOnException: () => {},
+    }),
+};

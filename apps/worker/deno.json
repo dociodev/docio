@@ -8,8 +8,8 @@
   "exports": {},
   "imports": {},
   "tasks": {
-    "dev": "deno serve --port 8786 --host 127.0.0.1 --env-file=../../.env --allow-env --watch main.ts",
+    "dev": "deno serve --port 8786 --host 127.0.0.1 --env-file=../../.env --allow-env --allow-net --watch main.ts",
     "check": "deno check main.ts",
-    "start": "deno serve --port $PORT --allow-env main.ts"
+    "start": "deno serve --port $PORT --allow-env --allow-net main.ts"
   }
 }

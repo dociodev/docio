@@ -59,7 +59,7 @@ export async function removeRepo(
       console.log(`🌐 Removing domain: ${domain.name}`);
       await cloudflare.pages.projects.domains.delete(
         repo.id.toString(),
-        domain.id!,
+        domain.name!,
         {
           account_id: env.CLOUDFLARE_ACCOUNT_ID,
         },
