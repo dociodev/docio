@@ -15,7 +15,7 @@ export const EnvSchema = z.object({
 
   WORKER_SECRET: z.string(),
   OCTOMOCK_URL: z.string().optional(),
-  WORKER_URL: z.string(),
+  WORKER_URL: z.string().optional(),
 
   CLOUDFLARE_API_TOKEN: z.string(),
   CLOUDFLARE_ACCOUNT_ID: z.string(),
