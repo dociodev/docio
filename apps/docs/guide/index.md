@@ -57,6 +57,14 @@ Your documentation will be available at a URL based on your organization name:
 - Special characters and spaces are replaced with hyphens
 - The final URL format is: `https://[slugified-org-name].docio.dev`
 
+:::warning
+
+Sometimes the organization name is not available, in this case, the URL will be
+`https://[slugified-org-name]-[random-string].docio.dev`. You can find the URL
+in the deployment logs in your GitHub repository.
+
+:::
+
 :::info Examples
 
 - Organization: `MyCompany` → `https://my-company.docio.dev`
