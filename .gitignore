@@ -3,7 +3,6 @@
 .secrets
 node_modules
 tmp
-.wrangler
 private-key.pem
 .DS_Store
 .vite

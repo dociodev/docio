@@ -1,10 +1,10 @@
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+generator drizzle {
+  provider = "drizzle-prisma-generator"
+  output   = "../src/schema.ts" // Where to put generated Drizle tables
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

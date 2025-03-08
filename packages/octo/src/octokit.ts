@@ -1,11 +1,13 @@
 import { App } from '@octokit/app';
 import type { Octokit } from '@octokit/core';
+import { env } from '@docio/env';
 
-export function createOctoApp(appId: string, privateKey: string) {
-  return new App({ privateKey, appId });
-}
+export function createOctokit(installationId: number) {
+  const app = new App({
+    privateKey: env.GITHUB_APP_PRIVATE_KEY,
+    appId: env.GITHUB_APP_ID,
+  });
 
-export function createOctokit(app: App, installationId: number) {
   return app.getInstallationOctokit(installationId);
 }
 

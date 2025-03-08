@@ -21,20 +21,9 @@ jobs:
 
       - name: Install dependencies
         run: deno install --allow-scripts
-      
-      - name: Generate DB Client
-        run: deno task db client generate
 
       - name: Test
         run: deno task -r test
 
       - name: Typecheck
         run: deno task typecheck
-
-      - name: Build and Deploy
-        run: |
-          deno task db migrations up --remote
-          deno task wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

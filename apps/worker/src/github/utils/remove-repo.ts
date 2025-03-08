@@ -1,45 +1,31 @@
-import type { PrismaClient } from '@docio/db';
-import type { Cloudflare } from 'cloudflare';
-import type { Client } from '@upstash/qstash';
+import { db, eq, Repository, Task } from '@docio/db';
+import { env } from '@docio/env';
+import { cloudflare } from '@docio/cloudflare';
 
 export async function removeRepo(
   repositoryFullName: string,
-  {
-    db,
-    cloudflare,
-    zoneId,
-    accountId,
-    qstash,
-  }: {
-    db: PrismaClient;
-    cloudflare: Cloudflare;
-    zoneId: string;
-    accountId: string;
-    qstash: Client;
-  },
 ) {
   console.log(
     `🗑️ Starting removal process for repository: ${repositoryFullName}`,
   );
 
-  const repo = await db.repository.findFirst({
-    where: {
-      fullName: repositoryFullName,
-    },
-    select: {
+  const repo = await db.query.Repository.findFirst({
+    where: eq(Repository.fullName, repositoryFullName),
+    columns: {
       id: true,
+    },
+    with: {
       domains: {
-        where: {
+        columns: {
           isDocioDomain: true,
+          dnsRecordId: true,
         },
       },
       tasks: {
-        select: {
+        columns: {
           id: true,
         },
-        where: {
-          status: 'PENDING',
-        },
+        where: eq(Task.status, 'PENDING'),
       },
     },
   });
@@ -56,7 +42,7 @@ export async function removeRepo(
     }
     console.log(`🌐 Removing DNS record: ${domain.dnsRecordId}`);
     await cloudflare.dns.records.delete(domain.dnsRecordId, {
-      zone_id: zoneId,
+      zone_id: env.CLOUDFLARE_ZONE_ID,
     });
   }
 
@@ -64,7 +50,7 @@ export async function removeRepo(
     .list(
       repo.id.toString(),
       {
-        account_id: accountId,
+        account_id: env.CLOUDFLARE_ACCOUNT_ID,
       },
     );
 
@@ -73,9 +59,9 @@ export async function removeRepo(
       console.log(`🌐 Removing domain: ${domain.name}`);
       await cloudflare.pages.projects.domains.delete(
         repo.id.toString(),
-        domain.id!,
+        domain.name!,
         {
-          account_id: accountId,
+          account_id: env.CLOUDFLARE_ACCOUNT_ID,
         },
       );
     }
@@ -83,19 +69,8 @@ export async function removeRepo(
 
   console.log(`🔧 Removing Cloudflare Pages project for repo ID: ${repo.id}`);
   await cloudflare.pages.projects.delete(repo.id.toString(), {
-    account_id: accountId,
+    account_id: env.CLOUDFLARE_ACCOUNT_ID,
   });
 
-  if (tasks.length > 0) {
-    console.log(`🧹 Cleaning up ${tasks.length} pending tasks`);
-    await qstash.dlq.deleteMany({
-      dlqIds: tasks.map((task) => task.id),
-    });
-  }
-
-  await db.repository.delete({
-    where: {
-      id: repo.id,
-    },
-  });
+  await db.delete(Repository).where(eq(Repository.id, repo.id));
 }

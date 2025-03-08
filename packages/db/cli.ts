@@ -14,7 +14,7 @@ await new Command()
         new Command()
           .description('Generate a db client')
           .action(async () => {
-            await $`node ../../node_modules/.bin/prisma generate`;
+            await $`prisma generate`;
           }),
       ),
   )
@@ -27,46 +27,32 @@ await new Command()
         new Command()
           .description('Create a new migration')
           .arguments('<name:string>')
+          .env('DATABASE_URL=<string>', 'Postgres database URL')
           .action(async (_, name) => {
-            await $`node ../../node_modules/.bin/wrangler d1 migrations create docio-db ${name}`
-              .cwd('../../apps/worker');
-
-            const migrations = (await Array.fromAsync(
-              Deno.readDir('./migrations'),
-            )).filter((file) => file.isFile && file.name.endsWith('.sql')).sort(
-              (
-                a,
-                b,
-              ) => a.name.localeCompare(b.name),
-            );
-
-            const isInitialMigration = migrations.length === 1;
-
-            const migration = migrations.at(-1);
-
-            if (!migration) {
-              throw new Error('No migration found');
-            }
-
-            await $`node ../../node_modules/.bin/prisma migrate diff ${
-              isInitialMigration ? '--from-empty' : '--from-local-d1'
-            } --to-schema-datamodel ../../packages/db/prisma/schema.prisma --script --output ../../packages/db/migrations/${migration.name}`
-              .cwd('../../apps/worker');
+            await $`deno --env-file=../../.env -A ../../node_modules/.bin/prisma migrate dev --name ${name}`;
           }),
       )
       .command(
         'up',
         new Command()
           .description('Apply migrations')
+          .env('DATABASE_URL=<string>', 'Postgres database URL')
           .option('--remote', 'Apply migrations to the remote database', {
             default: false,
           })
           .action(async ({ remote }) => {
-            await $`node ../../node_modules/.bin/wrangler d1 migrations apply docio-db ${
-              remote ? '--remote' : '--local'
-            }`
-              .cwd('../../apps/worker');
+            await $`deno --env-file=../../.env -A ../../node_modules/.bin/prisma ${
+              remote ? ['migrate', 'deploy'] : ['db', 'push']
+            }`;
           }),
       ),
+  )
+  .command(
+    'studio',
+    new Command()
+      .description('Open the Prisma Studio')
+      .action(async () => {
+        await $`deno --env-file=../../.env -A ../../node_modules/.bin/prisma studio`;
+      }),
   )
   .parse(Deno.args);

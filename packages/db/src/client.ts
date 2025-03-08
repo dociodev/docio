@@ -1,10 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-import { PrismaD1 } from '@prisma/adapter-d1';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import * as schema from './schema.ts';
+import { env } from '@docio/env';
 
-export function createDbClient(db: D1Database) {
-  const adapter = new PrismaD1(db);
-
-  return new PrismaClient({ adapter });
-}
-
-export { PrismaClient };
+export const db = drizzle(env.DATABASE_URL, {
+  schema,
+});

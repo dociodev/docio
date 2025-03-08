@@ -1,4 +1,5 @@
 import { $ } from '@david/dax';
+import { env } from '@docio/env';
 
 export async function deploy(
   repoId: number,
@@ -6,13 +7,11 @@ export async function deploy(
   deploymentId: number,
 ) {
   await fetch(
-    `${
-      Deno.env.get('WORKER_URL')
-    }/api/repository/${repoId}/deployment/${deploymentId}/in_progress`,
+    `${env.WORKER_URL}/api/repository/${repoId}/deployment/${deploymentId}/in_progress`,
     {
       method: 'POST',
       headers: {
-        'X-Worker-Secret': Deno.env.get('WORKER_SECRET')!,
+        'X-Worker-Secret': env.WORKER_SECRET,
       },
     },
   );
@@ -36,26 +35,22 @@ export async function deploy(
   try {
     await $`wrangler pages deploy --branch=${ref}`.cwd('./tmp/untar');
     await fetch(
-      `${
-        Deno.env.get('WORKER_URL')
-      }/api/repository/${repoId}/deployment/${deploymentId}/success`,
+      `${env.WORKER_URL}/api/repository/${repoId}/deployment/${deploymentId}/success`,
       {
         method: 'POST',
         headers: {
-          'X-Worker-Secret': Deno.env.get('WORKER_SECRET')!,
+          'X-Worker-Secret': env.WORKER_SECRET,
         },
       },
     );
   } catch (error) {
     console.error(error);
     await fetch(
-      `${
-        Deno.env.get('WORKER_URL')
-      }/api/repository/${repoId}/deployment/${deploymentId}/failure`,
+      `${env.WORKER_URL}/api/repository/${repoId}/deployment/${deploymentId}/failure`,
       {
         method: 'POST',
         headers: {
-          'X-Worker-Secret': Deno.env.get('WORKER_SECRET')!,
+          'X-Worker-Secret': env.WORKER_SECRET,
         },
       },
     );

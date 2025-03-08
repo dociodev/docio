@@ -2,17 +2,9 @@
   "name": "@docio/tasks",
   "version": "0.0.1",
   "exports": {},
-  "imports": {
-    "@cliffy/command": "jsr:@cliffy/command@^1.0.0-rc.7",
-    "@david/dax": "jsr:@david/dax@^0.42.0",
-    "@std/fs": "jsr:@std/fs@^1.0.14",
-    "@std/path": "jsr:@std/path@^1.0.8",
-    "@std/tar": "jsr:@std/tar@^0.1.5",
-    "cloudflare": "npm:cloudflare@^4.1.0",
-    "rspress": "npm:rspress@^1.41.2"
-  },
+  "imports": {},
   "tasks": {
-    "docio": "deno run --allow-net --allow-write --allow-read --allow-env --allow-run cli.ts",
+    "docio": "deno run --env-file=../.env --allow-net --allow-write --allow-read --allow-env --allow-run cli.ts",
     "check": "deno check cli.ts"
   }
 }

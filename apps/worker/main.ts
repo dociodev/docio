@@ -1,13 +1,13 @@
 import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import type { Env } from '@docio/env';
-import { createDbClient } from '@docio/db';
-import { createOctoApp, createOctokit, getOctokitToken } from '@docio/octo';
-import { repositoryApi } from './api/repository.ts';
-import { eventMiddleware } from './github/events/index.ts';
+import { env, type HonoEnv } from '@docio/env';
+import { db, eq, Repository } from '@docio/db';
+import { createOctokit, getOctokitToken } from '@docio/octo';
+import { repositoryApi } from './src/api/repository.ts';
+import { eventMiddleware } from './src/github/events/index.ts';
 
-const app = new Hono<Env>();
+const app = new Hono<HonoEnv>();
 
 async function signRequestBody(secret: string, body: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -47,7 +47,10 @@ app.post(
     }
 
     if (
-      await signRequestBody(c.env.GITHUB_APP_WEBHOOK_SECRET, body) !== signature
+      await signRequestBody(
+        env.GITHUB_APP_WEBHOOK_SECRET,
+        body,
+      ) !== signature
     ) {
       return c.json({ message: 'Invalid signature' }, 400);
     }
@@ -69,7 +72,7 @@ app.get(
   async (c, next) => {
     const { 'X-Worker-Secret': secret } = c.req.valid('header');
 
-    if (secret !== c.env.WORKER_SECRET) {
+    if (secret !== env.WORKER_SECRET) {
       return c.json({ message: 'Invalid secret' }, 401);
     }
 
@@ -87,14 +90,14 @@ app.get(
     const { owner, repo, ref } = c.req.valid('param');
     console.log(`📦 Fetching repository content: ${owner}/${repo}@${ref}`);
 
-    const db = createDbClient(c.env.db);
-
-    const repository = await db.repository.findFirst({
-      where: {
-        fullName: `${owner}/${repo}`,
-      },
-      select: {
-        installation: true,
+    const repository = await db.query.Repository.findFirst({
+      where: eq(Repository.fullName, `${owner}/${repo}`),
+      with: {
+        installation: {
+          columns: {
+            id: true,
+          },
+        },
       },
     });
 
@@ -105,11 +108,7 @@ app.get(
       return c.json({ message: 'Not found' }, 404);
     }
 
-    const app = createOctoApp(
-      c.env.GITHUB_APP_ID!,
-      c.env.GITHUB_APP_PRIVATE_KEY!,
-    );
-    const octokit = await createOctokit(app, repository.installation.id);
+    const octokit = await createOctokit(repository.installation.id);
     const token = await getOctokitToken(octokit, repository.installation.id);
 
     const getTarballResponse = await fetch(
@@ -146,4 +145,14 @@ app.get(
 
 app.route('/api', repositoryApi);
 
-export default app;
+export default {
+  fetch: (request: Request) =>
+    app.fetch(request, {}, {
+      waitUntil: (promise: Promise<unknown>) => {
+        promise.catch((err) => {
+          console.error(err);
+        });
+      },
+      passThroughOnException: () => {},
+    }),
+};
