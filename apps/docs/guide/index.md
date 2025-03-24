@@ -1,5 +1,5 @@
 ---
-sidebar: false
+sidebar: true
 ---
 
 # Deploying to `docio.dev`

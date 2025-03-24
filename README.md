@@ -11,15 +11,16 @@ need a simple and reliable way to host their documentation.
 - GitHub integration for seamless deployment
 - Zero-configuration setup
 
-## Current Development Status
+## Roadmap
 
 - [x] Basic deployment pipeline
 - [x] GitHub App integration
 - [x] Automatic builds on push
 - [ ] Documentation site preview for PRs
-- [ ] Custom domains support
-- [ ] Support not only repo with the `docio` name
 - [ ] Plugins support
+- [ ] AI support assistant (paid feature)
+- [ ] Custom domains support (paid feature)
+- [ ] Support not only repo with the `docio` name (paid feature)
 
 ## 🏗 Project Structure
 
